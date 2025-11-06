@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - PlayerData
+  - PlayerInfoPanel
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - Effect
+  - Character
+  - Ground
+  - Background
+  - NPC
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 2727397399
+    locked: 0
+  - name: Ground
+    uniqueID: 2837955947
+    locked: 0
+  - name: Shadow
+    uniqueID: 1539571537
+    locked: 0
+  - name: NPC
+    uniqueID: 2667168291
+    locked: 0
+  - name: Character
+    uniqueID: 2604701653
+    locked: 0
+  - name: Effect
+    uniqueID: 4109935305
+    locked: 0
+  - name: 'UI_World '
+    uniqueID: 437925293
+    locked: 0
+  - name: UI
+    uniqueID: 1277283687
+    locked: 0
+  - name: UI_Top
+    uniqueID: 1595234455
+    locked: 0

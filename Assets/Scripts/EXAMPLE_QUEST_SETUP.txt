@@ -1,0 +1,106 @@
+EXAMPLE QUEST CONFIGURATION
+============================
+
+Create these Quest ScriptableObjects in Unity:
+
+---
+
+QUEST 1: "Welcome to Battle"
+-----------------------------
+Quest ID: 1
+Quest Name: Welcome to Battle
+Quest Description: Prove yourself by defeating your first enemy!
+Required Battles: 1
+Target NPC ID: (leave empty - any NPC works)
+Gold Reward: 50
+Experience Reward: 25
+Unlocked Map Areas: ["Tutorial"]
+Unlocked NPC Ids: ["NPC_001"]
+
+Result: After completing, NPC_001 appears in map ScrollView
+
+---
+
+QUEST 2: "Defeat the Goblin"
+-----------------------------
+Quest ID: 2
+Quest Name: Defeat the Goblin
+Quest Description: A goblin has been terrorizing the village. Defeat it!
+Required Battles: 1
+Target NPC ID: NPC_001
+Gold Reward: 100
+Experience Reward: 50
+Unlocked Map Areas: ["Forest"]
+Unlocked NPC Ids: ["NPC_002"]
+
+Result: After completing, NPC_002 appears in map ScrollView
+
+---
+
+QUEST 3: "Orc Invasion"
+-----------------------
+Quest ID: 3
+Quest Name: Orc Invasion
+Quest Description: Defeat 2 orcs to protect the town!
+Required Battles: 2
+Target NPC ID: NPC_002
+Gold Reward: 200
+Experience Reward: 100
+Unlocked Map Areas: ["Mountain"]
+Unlocked NPC Ids: ["NPC_003", "NPC_004"]
+
+Result: After completing, NPC_003 and NPC_004 both appear
+
+---
+
+MAP NPC SETUP
+=============
+
+In MapScene ScrollView, set each NPC's Required Quest Level:
+
+NPC 1 (First enemy):
+- Required Quest Level: 0
+- NPC Name: Goblin Scout
+- Enemy Level: 1
+
+NPC 2 (Second enemy):
+- Required Quest Level: 1
+- NPC Name: Orc Warrior
+- Enemy Level: 3
+
+NPC 3 (Third enemy):
+- Required Quest Level: 2
+- NPC Name: Dark Mage
+- Enemy Level: 5
+
+NPC 4 (Fourth enemy):
+- Required Quest Level: 3
+- NPC Name: Dragon
+- Enemy Level: 10
+
+---
+
+PROGRESSION FLOW (SIMPLIFIED!)
+================================
+
+Start Game:
+→ Player questLevel = 0
+→ Goblin Scout (requiredQuestLevel: 0) visible
+
+Beat Goblin Scout:
+→ Player questLevel = 1 (auto-increased!)
+→ Orc Warrior (requiredQuestLevel: 1) now visible
+→ Can battle immediately, no need to return to quest giver!
+
+Beat Orc Warrior:
+→ Player questLevel = 2
+→ Dark Mage (requiredQuestLevel: 2) now visible
+
+Beat Dark Mage:
+→ Player questLevel = 3
+→ Dragon (requiredQuestLevel: 3) now visible
+
+**Quest giver is optional:**
+- Use it for story/dialog
+- Turn in quests for extra rewards (gold, XP)
+- But NPCs unlock automatically after battles!
