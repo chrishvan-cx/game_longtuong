@@ -31,8 +31,6 @@ public class QuestGiverNPC : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("[QuestGiverNPC] Start() called");
-
         EnsureEventSystem();
 
         // Fallbacks in case references are missing in build
@@ -154,28 +152,23 @@ public class QuestGiverNPC : MonoBehaviour
     /*
     void OnMouseDown()
     {
-        Debug.Log("[QuestGiverNPC] OnMouseDown detected!");
         OnNPCClicked();
     }
     */
 
     public void OnNPCClicked()
     {
-        Debug.Log("[QuestGiverNPC] OnNPCClicked() called!");
-        
         // If player is already nearby, open dialog immediately
         if (playerNearby)
         {
-            Debug.Log("[QuestGiverNPC] Player already nearby; opening dialog immediately.");
             ShowQuestDialog();
             pendingDialogOpen = false;
             return;
         }
-        
+
         // Player is far away: move to NPC, open dialog on arrival via trigger
         MovePlayerToNPC();
         pendingDialogOpen = true;
-        Debug.Log($"[QuestGiverNPC] pendingDialogOpen set to true, playerNearby={playerNearby}");
     }
 
     private void MovePlayerToNPC()
@@ -184,36 +177,28 @@ public class QuestGiverNPC : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player == null)
         {
-            Debug.LogError("[QuestGiverNPC] Player not found with tag 'Player'!");
             return;
         }
-        
-        Debug.Log($"[QuestGiverNPC] Found player: {player.name}");
-        
+
         PlayerMovement movement = player.GetComponent<PlayerMovement>();
         if (movement == null)
         {
-            Debug.LogError("[QuestGiverNPC] Player doesn't have PlayerMovement component!");
             return;
         }
-        
+
         // Move to NPC position (trigger will detect when player arrives)
         Vector3 targetPos = transform.position;
-        Debug.Log($"[QuestGiverNPC] Moving player to {targetPos}");
         movement.MoveToPosition(targetPos);
     }
 
     // Trigger events - called when player enters/exits collider
     void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log($"[QuestGiverNPC] OnTriggerEnter2D called by: {other.gameObject.name}, tag: {other.tag}");
-        
         // Check if it's the player
         if (other.CompareTag("Player"))
         {
-            Debug.Log("[QuestGiverNPC] Player entered trigger!");
             playerNearby = true;
-            
+
             // Show NPC button (if using proximity-based button)
             if (npcButton != null && requireProximity)
                 npcButton.gameObject.SetActive(true);
@@ -222,37 +207,32 @@ public class QuestGiverNPC : MonoBehaviour
             // Don't open if player just walked into the trigger
             if (pendingDialogOpen)
             {
-                Debug.Log("[QuestGiverNPC] Opening quest dialog (player clicked NPC)!");
                 ShowQuestDialog();
                 pendingDialogOpen = false;
             }
             else
             {
-                Debug.Log($"[QuestGiverNPC] Player entered trigger but didn't click NPC, not opening dialog.");
             }
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        Debug.Log($"[QuestGiverNPC] OnTriggerExit2D called by: {other.gameObject.name}");
-        
         // Check if it's the player
         if (other.CompareTag("Player"))
         {
-            Debug.Log("[QuestGiverNPC] Player exited trigger!");
             playerNearby = false;
-            
+
             // Clear pending dialog flag when leaving
             pendingDialogOpen = false;
-            
+
             // Hide NPC button (if using proximity-based button)
             if (npcButton != null && requireProximity)
                 npcButton.gameObject.SetActive(false);
-            
+
             // Don't hide quest indicators - they should stay visible based on quest status
             // HideAllIndicators(); // REMOVED - indicators show quest status, not proximity
-            
+
             // Close dialog if open
             if (questDialogPanel != null && questDialogPanel.activeSelf)
                 questDialogPanel.SetActive(false);
@@ -287,7 +267,6 @@ public class QuestGiverNPC : MonoBehaviour
         }
         else
         {
-            Debug.LogError("questDialogPanel is NULL!");
             return;
         }
 

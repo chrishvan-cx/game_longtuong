@@ -15,8 +15,10 @@ MonoBehaviour:
   heroName: Donal Trump
   sprite: {fileID: 0}
   animatorController: {fileID: 9100000, guid: 6bda1f5bf4224db44b12251ff5bfe8cb, type: 2}
-  maxHP: 100
+  maxHP: 200
   attack: 80
   speed: 10
+  energy: 50
+  specialSkill: {fileID: 0}
   column: 1
   row: 2

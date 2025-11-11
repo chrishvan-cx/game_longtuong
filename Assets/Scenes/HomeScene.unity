@@ -168,7 +168,7 @@ MonoBehaviour:
   allQuests:
   - {fileID: 11400000, guid: 3dbda118381314fb6b7ac2113efcd4d5, type: 2}
   - {fileID: 11400000, guid: 420a36be5a24a42a69972fe76660e340, type: 2}
-  questSaveVersion: 5
+  questSaveVersion: 6
 --- !u!4 &10596438
 Transform:
   m_ObjectHideFlags: 0
@@ -3726,7 +3726,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3bd31e80114dd4e22b80fb6f2417bfe1, type: 2}
   - {fileID: 11400000, guid: 875f2dba9c43d4efcbddd7b810318076, type: 2}
   - {fileID: 11400000, guid: 41036cd953b0945d28ecfd64e240a90a, type: 2}
-  playerDataSaveVersion: 2
+  playerDataSaveVersion: 3
   playerLevel: 1
   playerExp: 414
   playerGold: 41000
@@ -3895,7 +3895,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.09448002, y: -1.4499998, z: 0}
-  m_LocalScale: {x: 17.353178, y: 6.6000004, z: 1}
+  m_LocalScale: {x: 18.47211, y: 6.6000004, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

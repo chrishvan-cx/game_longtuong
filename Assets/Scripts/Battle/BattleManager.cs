@@ -32,17 +32,17 @@ public class BattleManager : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 60;
-        
+
         // Load enemy team from GameManager (set by NPC)
         if (GameManager.Instance != null && GameManager.Instance.battleEnemyTeam.Count > 0)
         {
             LoadEnemyTeamFromGameManager();
         }
-        
+
         SpawnTeams();
         StartCoroutine(BattleLoop());
     }
-    
+
     private void LoadEnemyTeamFromGameManager()
     {
         teamB.Clear();
@@ -56,7 +56,7 @@ public class BattleManager : MonoBehaviour
         List<HeroData> playerData = (PlayerData.Instance != null && PlayerData.Instance.playerTeam.Count > 0)
             ? PlayerData.Instance.playerTeam
             : new List<HeroData>(); // fallback to empty if testing
-        
+
         for (int i = 0; i < playerData.Count && i < teamASlots.Length; i++)
         {
             if (teamASlots[i] != null)
@@ -75,10 +75,10 @@ public class BattleManager : MonoBehaviour
         }
 
         // Team B - use enemy team from GameManager if available
-        List<HeroData> enemyData = (GameManager.Instance != null && GameManager.Instance.battleEnemyTeam.Count > 0) 
-            ? GameManager.Instance.battleEnemyTeam 
+        List<HeroData> enemyData = (GameManager.Instance != null && GameManager.Instance.battleEnemyTeam.Count > 0)
+            ? GameManager.Instance.battleEnemyTeam
             : new List<HeroData>(); // fallback to empty if testing
-        
+
         for (int i = 0; i < enemyData.Count && i < teamBSlots.Length; i++)
         {
             if (teamBSlots[i] != null)
@@ -126,9 +126,9 @@ public class BattleManager : MonoBehaviour
             else if (column == 3) posX = 6f;
         }
 
-        if (row == 2) posY = -0.5f;
-        else if (row == 1) posY = -1.5f;
-        else if (row == 3) posY = 1f;
+        if (row == 2) posY = 1f;
+        else if (row == 1) posY = -0.5f;
+        else if (row == 3) posY = 2.5f;
 
         slot.position = new Vector3(posX, posY, 0);
         slot.localScale = new Vector3(0.01f, 0.01f, 0.01f);
@@ -285,14 +285,14 @@ public class BattleManager : MonoBehaviour
                     int expGained = GameManager.Instance.battleExpReward;
                     int goldGained = GameManager.Instance.battleGoldReward;
                     List<ItemReward> itemRewards = GameManager.Instance.battleItemRewards;
-                    
+
                     // If testing directly from Battle Scene, use default rewards
                     if (expGained == 0 && goldGained == 0 && itemRewards.Count == 0)
                     {
                         expGained = 100;
                         goldGained = 50;
                     }
-                    
+
                     resultPanel.ShowVictory(expGained, goldGained, itemRewards);
                 }
                 else

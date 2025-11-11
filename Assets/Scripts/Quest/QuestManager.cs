@@ -161,7 +161,6 @@ public class QuestManager : MonoBehaviour
         QuestData quest = GetCurrentQuest();
         if (quest == null || !CanCompleteQuest())
         {
-            Debug.LogWarning("Cannot complete quest!");
             return;
         }
 
@@ -257,7 +256,6 @@ public class QuestManager : MonoBehaviour
     public void ResetAllProgress()
     {
         ResetAllProgressInternal();
-        Debug.Log("All quest progress reset!");
     }
 
     private void ResetAllProgressInternal()

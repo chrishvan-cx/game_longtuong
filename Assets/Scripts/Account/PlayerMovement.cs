@@ -55,15 +55,13 @@ public class PlayerMovement : MonoBehaviour
         // Check for mouse click (left button)
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("[PlayerMovement] Mouse clicked");
-            
+
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
             // Priority 1: Check if clicking on NPC (before UI check!)
             RaycastHit2D npcHit = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, npcLayer);
             if (npcHit.collider != null)
             {
-                Debug.Log($"[PlayerMovement] NPC clicked: {npcHit.collider.name}");
                 QuestGiverNPC npc = npcHit.collider.GetComponentInParent<QuestGiverNPC>();
                 if (npc != null)
                 {
@@ -75,18 +73,14 @@ public class PlayerMovement : MonoBehaviour
             // Priority 2: Check if clicking on UI - if so, don't move
             if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             {
-                Debug.Log("[PlayerMovement] Clicked on UI, ignoring");
                 return; // Clicked on UI, ignore movement
             }
 
             // Priority 3: Check if clicking on ground
             RaycastHit2D groundHit = Physics2D.Raycast(ray.origin, ray.direction, Mathf.Infinity, groundLayer);
 
-            Debug.Log($"[PlayerMovement] Raycast hit: {(groundHit.collider != null ? groundHit.collider.name : "nothing")}, groundLayer: {groundLayer.value}");
-
             if (groundHit.collider != null)
             {
-                Debug.Log($"[PlayerMovement] Moving to ground position: {groundHit.point}");
                 // Set new target position
                 targetPosition = groundHit.point;
                 isMoving = true;
@@ -100,7 +94,6 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("[PlayerMovement] Ground raycast hit nothing! Check groundLayer setting.");
             }
         }
     }
@@ -166,7 +159,6 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public void MoveToPosition(Vector3 position)
     {
-        Debug.Log($"[PlayerMovement] MoveToPosition called! Target: {position}, Current: {transform.position}");
         targetPosition = position;
         isMoving = true;
 
@@ -176,8 +168,6 @@ public class PlayerMovement : MonoBehaviour
             moveTargetIndicator.transform.position = targetPosition;
             moveTargetIndicator.SetActive(true);
         }
-        
-        Debug.Log($"[PlayerMovement] isMoving set to {isMoving}");
     }
 
     /// <summary>
@@ -187,7 +177,6 @@ public class PlayerMovement : MonoBehaviour
     {
         if (EventSystem.current == null)
         {
-            Debug.LogError("EventSystem.current is NULL!");
             return false;
         }
 

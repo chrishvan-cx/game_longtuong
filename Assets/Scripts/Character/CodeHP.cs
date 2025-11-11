@@ -44,7 +44,7 @@ public class CodeHP : MonoBehaviour
         return codeHP;
     }
 
-    public void SetHealth(float health)
+    public void SetHealth(float health, int maxHP)
     {
         fillHP.localScale = new Vector3(health, 1, 1);
     }

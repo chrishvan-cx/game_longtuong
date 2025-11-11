@@ -15,8 +15,10 @@ MonoBehaviour:
   heroName: Kim Jong Un
   sprite: {fileID: 0}
   animatorController: {fileID: 9100000, guid: 6bda1f5bf4224db44b12251ff5bfe8cb, type: 2}
-  maxHP: 50
+  maxHP: 220
   attack: 40
   speed: 12
+  energy: 50
+  specialSkill: {fileID: 11400000, guid: adae7bc68418e459aa9538a24fcd3fa5, type: 2}
   column: 2
   row: 3

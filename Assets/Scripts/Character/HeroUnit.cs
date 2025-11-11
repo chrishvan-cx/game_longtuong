@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 using System;
 using UnityEngine.Events;
 
@@ -16,12 +17,20 @@ public class HeroUnit : MonoBehaviour
     public GameObject damagePopupPrefab;   // Damage popup prefab
     public Transform damagePopupSpawnPoint; // Where to spawn damage popup (above hero)
 
-    [Header("Stats")]
+    [HideInInspector]
     public HeroData data;
+
+    [Header("Stats")]
     public int currentHP;
     public bool isAlive = true;
     public int teamId; // 0 = left, 1 = right
     public bool IsPerformingAction { get; private set; } = false;
+
+    [Header("Energy System")]
+    private int currentEnergy;
+    private const int MaxEnergy = 100;
+    private const int EnergyGainPerEvent = 25;
+    public int CurrentEnergy => currentEnergy; // Read-only property for UI
 
     [Header("Round Tracking")]
     public int h_round = 0;  // Last round this hero acted in
@@ -35,6 +44,7 @@ public class HeroUnit : MonoBehaviour
     private HeroUnit currentTarget;
     private CodeHP codeHP;
     [SerializeField] private HealthBar healthBar;
+    [SerializeField] private EnergyBar energyBar;
 
     // Animation event flags
     private bool attackAnimationComplete = false;
@@ -55,9 +65,17 @@ public class HeroUnit : MonoBehaviour
     public class HPChangeEvent : UnityEvent<int, int> { } // oldHP, newHP
     public HPChangeEvent OnHPChanged = new HPChangeEvent();
 
+    // Energy Change Event System - triggers when energy changes
+    [System.Serializable]
+    public class EnergyChangeEvent : UnityEvent<int> { } // newEnergy
+    public EnergyChangeEvent OnEnergyChanged = new EnergyChangeEvent();
+
     void Start()
     {
-        if (data != null) Setup(data, teamId);
+        if (data != null)
+        {
+            Setup(data, teamId);
+        }
     }
 
     public void Setup(HeroData d, int team)
@@ -68,6 +86,18 @@ public class HeroUnit : MonoBehaviour
         isAlive = true;
         h_round = 0;
         is_turn = false;
+
+        // Initialize energy to 50 (50% of max)
+        currentEnergy = data.energy;
+        OnEnergyChanged.Invoke(currentEnergy);
+
+        // Initialize energy bar UI
+        if (energyBar != null)
+            energyBar.SetEnergy(currentEnergy);
+
+        // Initialize health bar UI
+        if (healthBar != null)
+            healthBar.SetHealth(currentHP, data.maxHP);
 
         if (animator != null && data.animatorController != null)
         {
@@ -103,31 +133,40 @@ public class HeroUnit : MonoBehaviour
         // Show hero station indicator during turn
         SetHeroStationVisible(true);
 
-        // Choose a random alive enemy
-        var bm = BattleManager.Instance;
-        if (bm == null)
-            yield break;
-
-        var enemies = teamId == 0 ? bm.teamB : bm.teamA;
-        if (enemies == null)
-            yield break;
-
-        // Build a lightweight list of alive enemies
-        var alive = new System.Collections.Generic.List<HeroUnit>();
-        for (int i = 0; i < enemies.Count; i++)
+        // Check if hero has full energy and a special skill
+        if (currentEnergy >= MaxEnergy && data.specialSkill != null)
         {
-            var e = enemies[i];
-            if (e != null && e.isAlive) alive.Add(e);
+            // Perform special skill attack
+            yield return PerformSpecialSkill();
         }
-        if (alive.Count == 0)
-            yield break;
+        else
+        {
+            // Choose a random alive enemy for normal attack
+            var bm = BattleManager.Instance;
+            if (bm == null)
+                yield break;
 
-        var target = alive[UnityEngine.Random.Range(0, alive.Count)];
-        if (target == null)
-            yield break;
+            var enemies = teamId == 0 ? bm.teamB : bm.teamA;
+            if (enemies == null)
+                yield break;
 
-        // Execute the attack fully inside this hero
-        yield return PerformAttack(target);
+            // Build a lightweight list of alive enemies
+            var alive = new System.Collections.Generic.List<HeroUnit>();
+            for (int i = 0; i < enemies.Count; i++)
+            {
+                var e = enemies[i];
+                if (e != null && e.isAlive) alive.Add(e);
+            }
+            if (alive.Count == 0)
+                yield break;
+
+            var target = alive[UnityEngine.Random.Range(0, alive.Count)];
+            if (target == null)
+                yield break;
+
+            // Execute normal attack
+            yield return PerformAttack(target);
+        }
 
         // Hide hero station indicator after turn
         SetHeroStationVisible(false);
@@ -164,13 +203,23 @@ public class HeroUnit : MonoBehaviour
 
         // Update UI immediately
         if (healthBar != null)
-            healthBar.SetHealth((float)currentHP / data.maxHP);
+        {
+            healthBar.SetHealth(currentHP, data.maxHP);
+        }
         if (codeHP != null)
-            codeHP.SetHealth((float)currentHP / data.maxHP);
+        {
+            codeHP.SetHealth((float)currentHP / data.maxHP, data.maxHP);
+        }
         UpdateHPUI();
 
         // Fire HP change event
         OnHPChanged.Invoke(previousHP, currentHP);
+
+        // Gain energy from taking damage (only if alive)
+        if (currentHP > 0)
+        {
+            AddEnergy(EnergyGainPerEvent);
+        }
 
         // Play hit animation (non-blocking - runs in parallel)
         StartCoroutine(PlayHitAnimationCoroutine());
@@ -345,7 +394,10 @@ public class HeroUnit : MonoBehaviour
         }
         transform.position = originalPosition;
 
-        // STEP 6: Reset attacker to Idle state (turn complete)
+        // STEP 6: Gain energy from performing attack
+        AddEnergy(EnergyGainPerEvent);
+
+        // STEP 7: Reset attacker to Idle state (turn complete)
         if (animator != null)
         {
             animator.SetTrigger("Idle");
@@ -445,5 +497,264 @@ public class HeroUnit : MonoBehaviour
         }
     }
 
+    // Energy System Methods
+    // Note: Energy can overflow past 100% for bonus damage
+    // Every 25% overflow adds 25% of base attack damage to special skills
+    private void AddEnergy(int amount)
+    {
+        if (!isAlive)
+            return;
+
+        currentEnergy += amount;
+        // Energy cap disabled to allow overflow bonus damage
+        // if (currentEnergy > MaxEnergy)
+        //     currentEnergy = MaxEnergy;
+        if (currentEnergy < 0)
+            currentEnergy = 0;
+
+        OnEnergyChanged.Invoke(currentEnergy);
+    }
+
+    // Special Skill System
+    public IEnumerator PerformSpecialSkill()
+    {
+        if (!isAlive || data.specialSkill == null)
+        {
+            yield break;
+        }
+
+        IsPerformingAction = true;
+        Skill skill = data.specialSkill;
+
+        // STEP 1: Play cast animation and VFX
+        // Note: Don't use Attack animation as it triggers OnAttackHit() event!
+        // Use Idle or create a separate Cast animation without damage events
+        if (animator != null)
+        {
+            animator.SetTrigger("CastSpell");
+        }
+
+        // STEP 2: Wait for cast windup
+        yield return new WaitForSeconds(skill.castWindup);
+
+        // STEP 3: Get enemy targets
+        var bm = BattleManager.Instance;
+        if (bm == null)
+        {
+            IsPerformingAction = false;
+            yield break;
+        }
+
+        var enemies = teamId == 0 ? bm.teamB : bm.teamA;
+        if (enemies == null)
+        {
+            IsPerformingAction = false;
+            yield break;
+        }
+
+        // Build list of alive enemies
+        var aliveEnemies = new System.Collections.Generic.List<HeroUnit>();
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            var e = enemies[i];
+            if (e != null && e.isAlive) aliveEnemies.Add(e);
+        }
+
+        if (aliveEnemies.Count == 0)
+        {
+            // No targets, reset energy and exit
+            currentEnergy = 0;
+            OnEnergyChanged.Invoke(currentEnergy);
+            IsPerformingAction = false;
+            yield break;
+        }
+
+        // STEP 4: Launch meteors based on skill type
+        if (skill.isAOE)
+        {
+            // AOE: Launch all meteors simultaneously
+            int meteorCount = aliveEnemies.Count;
+            int completedMeteors = 0;
+
+            foreach (var enemy in aliveEnemies)
+            {
+                StartCoroutine(MeteorFallWithCallback(enemy, skill, () => completedMeteors++));
+            }
+
+            // Transition to Idle immediately after launching (don't wait)
+            if (animator != null)
+            {
+                animator.SetTrigger("Idle");
+            }
+
+            // Wait for ALL meteors to complete
+            while (completedMeteors < meteorCount)
+            {
+                yield return null;
+            }
+        }
+        else
+        {
+            // Single target: Choose random enemy
+            var target = aliveEnemies[UnityEngine.Random.Range(0, aliveEnemies.Count)];
+            yield return MeteorFall(target, skill);
+
+            // Transition to Idle after single meteor launches
+            if (animator != null)
+            {
+                animator.SetTrigger("Idle");
+            }
+        }
+
+        // STEP 5: Reset energy to 0
+        currentEnergy = 0;
+        OnEnergyChanged.Invoke(currentEnergy);
+
+        yield return new WaitForSeconds(0.3f);
+        IsPerformingAction = false;
+    }
+
+    // Wrapper for MeteorFall with completion callback (used for AOE)
+    private IEnumerator MeteorFallWithCallback(HeroUnit target, Skill skill, System.Action onComplete)
+    {
+        yield return MeteorFall(target, skill);
+        onComplete?.Invoke();
+    }
+
+    private IEnumerator MeteorFall(HeroUnit target, Skill skill)
+    {
+        if (target == null || !target.isAlive || skill.effectPrefab == null)
+            yield break;
+
+        // Calculate target position at ground (herostation position)
+        Vector3 groundPosition = target.transform.position;
+
+        // If target has heroStationRenderer, use its position for more accurate ground placement
+        if (target.heroStationRenderer != null)
+        {
+            groundPosition = target.heroStationRenderer.transform.position;
+        }
+
+        // Calculate spawn position above the ground target
+        Vector3 spawnPosition = groundPosition + Vector3.up * skill.meteorSpawnHeight;
+        Vector3 targetPosition = groundPosition;
+
+        // Instantiate meteor effect
+        GameObject meteorObj = Instantiate(skill.effectPrefab, spawnPosition, Quaternion.identity);
+
+        // Get MeteorVisual component to control animation
+        MeteorVisual meteorVisual = meteorObj.GetComponent<MeteorVisual>();
+
+        // Animate meteor falling
+        float elapsed = 0f;
+        while (elapsed < skill.meteorFallDuration)
+        {
+            if (meteorObj != null)
+            {
+                float t = elapsed / skill.meteorFallDuration;
+                meteorObj.transform.position = Vector3.Lerp(spawnPosition, targetPosition, t);
+
+                // Update fall progress for visual effects
+                if (meteorVisual != null)
+                {
+                    meteorVisual.SetFallProgress(t);
+                }
+            }
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure meteor reaches target (ground/herostation)
+        if (meteorObj != null)
+        {
+            meteorObj.transform.position = targetPosition;
+
+            // IMPACT: Stop rotation and start fade-out IMMEDIATELY
+            if (meteorVisual != null)
+            {
+                meteorVisual.rotateWhileFalling = false;
+            }
+
+            // Start fade-out immediately (don't wait)
+            StartCoroutine(FadeOutAndDestroy(meteorObj, skill.impactPause));
+        }
+
+        // IMPACT: Apply damage with overflow energy bonus (in parallel with fade)
+        if (target != null && target.isAlive)
+        {
+            // Calculate base damage from skill multiplier
+            float baseDamage = data.attack * skill.damageMultiplier;
+
+            // Calculate overflow bonus if energy > 100%
+            float overflowBonus = 0f;
+            if (currentEnergy > MaxEnergy)
+            {
+                // For every 25% overflow (25 energy points), add 25% of base attack damage
+                int overflowEnergy = currentEnergy - MaxEnergy;
+                float overflowMultiplier = overflowEnergy / 25f; // How many 25% increments
+                overflowBonus = data.attack * 0.25f * overflowMultiplier;
+            }
+
+            // Total damage = base skill damage + overflow bonus
+            int totalDamage = Mathf.RoundToInt(baseDamage + overflowBonus);
+
+            StartCoroutine(target.TakeDamage(totalDamage));
+        }
+
+        // Wait for fade to complete before ending this coroutine
+        yield return new WaitForSeconds(skill.impactPause);
+    }
+
+    // Helper coroutine to fade out and destroy a game object
+    private IEnumerator FadeOutAndDestroy(GameObject obj, float duration)
+    {
+        if (obj == null)
+            yield break;
+
+        // Get all renderers on the meteor
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+
+        // Store original colors/alphas
+        Dictionary<Renderer, Color[]> originalColors = new Dictionary<Renderer, Color[]>();
+        foreach (var renderer in renderers)
+        {
+            Material[] materials = renderer.materials;
+            Color[] colors = new Color[materials.Length];
+            for (int i = 0; i < materials.Length; i++)
+            {
+                colors[i] = materials[i].color;
+            }
+            originalColors[renderer] = colors;
+        }
+
+        // Fade out over time
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+
+            // Fade all renderers
+            foreach (var kvp in originalColors)
+            {
+                if (kvp.Key == null) continue;
+
+                Material[] materials = kvp.Key.materials;
+                Color[] origColors = kvp.Value;
+
+                for (int i = 0; i < materials.Length && i < origColors.Length; i++)
+                {
+                    Color newColor = origColors[i];
+                    newColor.a = alpha;
+                    materials[i].color = newColor;
+                }
+            }
+
+            yield return null;
+        }
+
+        // Destroy the object
+        Destroy(obj);
+    }
 
 }
