@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e113dc6ef896f4e9cb7e56ffca2962d4, type: 3}
-  m_Name: MeteorStrike
+  m_Name: Blast_Strike
   m_EditorClassIdentifier: 
-  skillName: Meteor Strike!
-  skillType: 0
+  skillName: Blast Stike!
+  skillType: 1
   isAOE: 1
   damageMultiplier: 2
-  effectPrefab: {fileID: 7227330774217057766, guid: 8bc4554f79e4c41019831d473b2d35ed, type: 3}
+  effectPrefab: {fileID: 7227330774217057766, guid: 17ad243cc611d4996af9087f3cecf10d, type: 3}
   castWindup: 0.5
   meteorSpawnHeight: 7
   meteorFallDuration: 0.8
-  projectileSpeed: 7
-  projectileSpawnOffsetX: 0.5
-  projectileSpawnOffsetY: 1
+  projectileSpeed: 10
+  projectileSpawnOffsetX: 0
+  projectileSpawnOffsetY: -1
   impactPause: 0.3
   sfxCast: {fileID: 0}
   sfxImpact: {fileID: 0}

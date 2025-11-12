@@ -15,8 +15,10 @@ MonoBehaviour:
   heroName: Chuong Tu Di
   sprite: {fileID: 0}
   animatorController: {fileID: 9100000, guid: 6bda1f5bf4224db44b12251ff5bfe8cb, type: 2}
-  maxHP: 100
+  maxHP: 250
   attack: 70
   speed: 10
+  energy: 50
+  specialSkill: {fileID: 11400000, guid: 019dcedb1388a4a44aa1f93fad39e0d0, type: 2}
   column: 3
   row: 2

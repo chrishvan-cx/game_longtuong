@@ -13,7 +13,9 @@ public class HeroUnit : MonoBehaviour
     public Transform modelRoot;            // model (to flip left/right)
     public Image hpFill;                   // HeartBar/Image
     public TMP_Text nameText;              // Text (TMP)
+    public TMP_Text skillText;             // Skill text component (access GameObject via .gameObject)
     public SpriteRenderer heroStationRenderer; // Herostation indicator
+    public GameObject heroBody; // Hero body
     public GameObject damagePopupPrefab;   // Damage popup prefab
     public Transform damagePopupSpawnPoint; // Where to spawn damage popup (above hero)
 
@@ -86,6 +88,10 @@ public class HeroUnit : MonoBehaviour
         isAlive = true;
         h_round = 0;
         is_turn = false;
+
+        // Hide skill text initially
+        if (skillText != null)
+            skillText.gameObject.SetActive(false);
 
         // Initialize energy to 50 (50% of max)
         currentEnergy = data.energy;
@@ -533,6 +539,13 @@ public class HeroUnit : MonoBehaviour
         {
             animator.SetTrigger("CastSpell");
         }
+        
+        // Show skill name text
+        if (skillText != null)
+        {
+            skillText.gameObject.SetActive(true);
+            skillText.text = skill.skillName;
+        }
 
         // STEP 2: Wait for cast windup
         yield return new WaitForSeconds(skill.castWindup);
@@ -569,44 +582,91 @@ public class HeroUnit : MonoBehaviour
             yield break;
         }
 
-        // STEP 4: Launch meteors based on skill type
-        if (skill.isAOE)
+        // STEP 4: Execute skill based on type (Meteor or Projectile)
+        if (skill.skillType == SkillType.Meteor)
         {
-            // AOE: Launch all meteors simultaneously
-            int meteorCount = aliveEnemies.Count;
-            int completedMeteors = 0;
-
-            foreach (var enemy in aliveEnemies)
+            // Meteor skill - falls from above
+            if (skill.isAOE)
             {
-                StartCoroutine(MeteorFallWithCallback(enemy, skill, () => completedMeteors++));
+                // AOE: Launch all meteors simultaneously
+                int meteorCount = aliveEnemies.Count;
+                int completedMeteors = 0;
+
+                foreach (var enemy in aliveEnemies)
+                {
+                    StartCoroutine(MeteorFallWithCallback(enemy, skill, () => completedMeteors++));
+                }
+
+                // Transition to Idle immediately after launching
+                if (animator != null)
+                {
+                    animator.SetTrigger("Idle");
+                }
+
+                // Wait for ALL meteors to complete
+                while (completedMeteors < meteorCount)
+                {
+                    yield return null;
+                }
             }
-
-            // Transition to Idle immediately after launching (don't wait)
-            if (animator != null)
+            else
             {
-                animator.SetTrigger("Idle");
-            }
+                // Single target meteor
+                var target = aliveEnemies[UnityEngine.Random.Range(0, aliveEnemies.Count)];
+                yield return MeteorFall(target, skill);
 
-            // Wait for ALL meteors to complete
-            while (completedMeteors < meteorCount)
-            {
-                yield return null;
+                if (animator != null)
+                {
+                    animator.SetTrigger("Idle");
+                }
             }
         }
-        else
+        else if (skill.skillType == SkillType.Projectile)
         {
-            // Single target: Choose random enemy
-            var target = aliveEnemies[UnityEngine.Random.Range(0, aliveEnemies.Count)];
-            yield return MeteorFall(target, skill);
-
-            // Transition to Idle after single meteor launches
-            if (animator != null)
+            // Projectile skill - flies from caster to target
+            if (skill.isAOE)
             {
-                animator.SetTrigger("Idle");
+                // AOE: Launch all projectiles simultaneously
+                int projectileCount = aliveEnemies.Count;
+                int completedProjectiles = 0;
+
+                foreach (var enemy in aliveEnemies)
+                {
+                    StartCoroutine(ProjectileFlyWithCallback(enemy, skill, () => completedProjectiles++));
+                }
+
+                // Transition to Idle immediately after launching
+                if (animator != null)
+                {
+                    animator.SetTrigger("Idle");
+                }
+
+                // Wait for ALL projectiles to complete
+                while (completedProjectiles < projectileCount)
+                {
+                    yield return null;
+                }
+            }
+            else
+            {
+                // Single target projectile
+                var target = aliveEnemies[UnityEngine.Random.Range(0, aliveEnemies.Count)];
+                yield return ProjectileFly(target, skill);
+
+                if (animator != null)
+                {
+                    animator.SetTrigger("Idle");
+                }
             }
         }
 
-        // STEP 5: Reset energy to 0
+        // STEP 5: Hide skill text
+        if (skillText != null)
+        {
+            skillText.gameObject.SetActive(false);
+        }
+        
+        // STEP 6: Reset energy to 0
         currentEnergy = 0;
         OnEnergyChanged.Invoke(currentEnergy);
 
@@ -677,6 +737,104 @@ public class HeroUnit : MonoBehaviour
 
             // Start fade-out immediately (don't wait)
             StartCoroutine(FadeOutAndDestroy(meteorObj, skill.impactPause));
+        }
+
+        // IMPACT: Apply damage with overflow energy bonus (in parallel with fade)
+        if (target != null && target.isAlive)
+        {
+            // Calculate base damage from skill multiplier
+            float baseDamage = data.attack * skill.damageMultiplier;
+
+            // Calculate overflow bonus if energy > 100%
+            float overflowBonus = 0f;
+            if (currentEnergy > MaxEnergy)
+            {
+                // For every 25% overflow (25 energy points), add 25% of base attack damage
+                int overflowEnergy = currentEnergy - MaxEnergy;
+                float overflowMultiplier = overflowEnergy / 25f; // How many 25% increments
+                overflowBonus = data.attack * 0.25f * overflowMultiplier;
+            }
+
+            // Total damage = base skill damage + overflow bonus
+            int totalDamage = Mathf.RoundToInt(baseDamage + overflowBonus);
+
+            StartCoroutine(target.TakeDamage(totalDamage));
+        }
+
+        // Wait for fade to complete before ending this coroutine
+        yield return new WaitForSeconds(skill.impactPause);
+    }
+
+    // Wrapper for ProjectileFly with completion callback (used for AOE)
+    private IEnumerator ProjectileFlyWithCallback(HeroUnit target, Skill skill, System.Action onComplete)
+    {
+        yield return ProjectileFly(target, skill);
+        onComplete?.Invoke();
+    }
+
+    private IEnumerator ProjectileFly(HeroUnit target, Skill skill)
+    {
+        if (target == null || !target.isAlive || skill.effectPrefab == null)
+            yield break;
+
+        // Calculate spawn position near caster
+        Vector3 spawnPosition = transform.position +
+                                new Vector3(skill.projectileSpawnOffsetX * (teamId == 0 ? 1 : -1),
+                                            skill.projectileSpawnOffsetY - 1,
+                                            0);
+
+        // Calculate target position at ground (herostation position)
+        Vector3 bodyPosition = target.transform.position;
+
+        // If target has heroStationRenderer, use its position for more accurate ground placement
+        if (target.heroBody != null)
+        {
+            bodyPosition = target.heroBody.transform.position;
+        }
+        Vector3 targetPosition = bodyPosition;
+
+        // Instantiate projectile effect
+        GameObject projectileObj = Instantiate(skill.effectPrefab, spawnPosition, Quaternion.identity);
+
+        // Get BlastVisual component to control animation
+        BlastVisual blastVisual = projectileObj.GetComponent<BlastVisual>();
+
+        // Calculate flight duration based on distance and speed
+        float distance = Vector3.Distance(spawnPosition, targetPosition);
+        float flyDuration = distance / skill.projectileSpeed;
+
+        // Animate projectile flying
+        float elapsed = 0f;
+        while (elapsed < flyDuration)
+        {
+            if (projectileObj != null)
+            {
+                float t = elapsed / flyDuration;
+                projectileObj.transform.position = Vector3.Lerp(spawnPosition, targetPosition, t);
+
+                // Update fly progress for visual effects
+                if (blastVisual != null)
+                {
+                    blastVisual.SetFlyProgress(t);
+                }
+            }
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // Ensure projectile reaches target
+        if (projectileObj != null)
+        {
+            projectileObj.transform.position = targetPosition;
+
+            // IMPACT: Stop rotation and start fade-out IMMEDIATELY
+            if (blastVisual != null)
+            {
+                blastVisual.StopRotation();
+            }
+
+            // Start fade-out immediately (don't wait)
+            StartCoroutine(FadeOutAndDestroy(projectileObj, skill.impactPause));
         }
 
         // IMPACT: Apply damage with overflow energy bonus (in parallel with fade)

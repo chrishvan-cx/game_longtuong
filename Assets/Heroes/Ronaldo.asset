@@ -18,5 +18,7 @@ MonoBehaviour:
   maxHP: 100
   attack: 50
   speed: 13
+  energy: 50
+  specialSkill: {fileID: 11400000, guid: 019dcedb1388a4a44aa1f93fad39e0d0, type: 2}
   column: 2
   row: 1
