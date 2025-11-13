@@ -18,7 +18,8 @@ public class MapNPC : MonoBehaviour, IPointerClickHandler
     public List<ItemReward> itemRewards = new List<ItemReward>();
 
     [Header("Enemy Team")]
-    public List<HeroData> enemyTeam = new List<HeroData>();
+    public string enemyTeamId = "enermy_1_1";  // ID to load from JSON
+    public List<HeroData> enemyTeam = new List<HeroData>();  // Will be loaded from JSON
 
     [Header("UI References")]
     public TMP_Text textNameAndLevel;
@@ -26,6 +27,9 @@ public class MapNPC : MonoBehaviour, IPointerClickHandler
 
     void Start()
     {
+        // Load enemy team from JSON
+        LoadEnemyTeamFromJson();
+
         // Check if this NPC should be visible
         CheckUnlockState();
 
@@ -82,6 +86,26 @@ public class MapNPC : MonoBehaviour, IPointerClickHandler
         int playerMapLevel = QuestManager.Instance.GetMapLevel();
         bool isUnlocked = playerMapLevel >= requiredMapLevel;
         gameObject.SetActive(isUnlocked);
+    }
+
+    /// <summary>
+    /// Load enemy team from JSON based on enemyTeamId
+    /// </summary>
+    private void LoadEnemyTeamFromJson()
+    {
+        if (string.IsNullOrEmpty(enemyTeamId))
+        {
+            Debug.LogWarning($"[{npcName}] No enemyTeamId set, using empty team");
+            return;
+        }
+
+        // Load enemy team from mock data
+        enemyTeam = MockServerData.LoadEnemyTeam(enemyTeamId);
+        
+        if (enemyTeam.Count == 0)
+        {
+            Debug.LogWarning($"[{npcName}] Failed to load enemy team '{enemyTeamId}'");
+        }
     }
 
     // IPointerClickHandler implementation

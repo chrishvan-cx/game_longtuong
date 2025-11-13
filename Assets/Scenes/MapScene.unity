@@ -493,9 +493,7 @@ MonoBehaviour:
   areaNameText: {fileID: 1263431884}
   levelRangeText: {fileID: 707114268}
   npcsInArea:
-  - {fileID: 2043090165969282157, guid: ee7ddf002689f47c7b793d185f918d91, type: 3}
-  - {fileID: 2043090165969282157, guid: ee7ddf002689f47c7b793d185f918d91, type: 3}
-  - {fileID: 2043090165969282157, guid: 73c0aa0a42903493ba404f59cd3b098c, type: 3}
+  - {fileID: 2043090165969282157, guid: 9454997928fb34b26a20e6497911d5e4, type: 3}
   npcSelectionPanel: {fileID: 1581740304}
 --- !u!114 &572221154
 MonoBehaviour:

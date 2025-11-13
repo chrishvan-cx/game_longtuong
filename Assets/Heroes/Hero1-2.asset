@@ -10,15 +10,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af856c2d8e08d4998827a988258e0b97, type: 3}
-  m_Name: Chuong Tu Di
+  m_Name: Hero1-2
   m_EditorClassIdentifier: 
-  heroName: Chuong Tu Di
+  heroName: Britney Spear
   sprite: {fileID: 0}
   animatorController: {fileID: 9100000, guid: 6bda1f5bf4224db44b12251ff5bfe8cb, type: 2}
-  maxHP: 250
-  attack: 70
-  speed: 10
+  specialSkill: {fileID: 11400000, guid: adae7bc68418e459aa9538a24fcd3fa5, type: 2}
+  maxHP: 100
   energy: 50
-  specialSkill: {fileID: 11400000, guid: 019dcedb1388a4a44aa1f93fad39e0d0, type: 2}
-  column: 3
+  speed: 10
+  physDmg: 0
+  magicDmg: 50
+  pureDmg: 10
+  physDef: 0
+  magicDef: 25
+  pureDef: 5
+  accuracy: 0
+  dodge: 0
+  critChance: 0
+  critDamage: 0
+  lifeSteal: 0
+  blockChance: 0
+  counterChance: 0
+  position: 1
   row: 2

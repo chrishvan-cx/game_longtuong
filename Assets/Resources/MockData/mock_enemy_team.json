@@ -1,0 +1,38 @@
+{
+  "enermy_1_1": [
+    {
+      "heroId": "e_tienquan",
+      "position": "FrontLine",
+      "row": 2
+    }
+  ],
+  "enermy_1_2": [
+    {
+      "heroId": "e_tienquan",
+      "position": "FrontLine",
+      "row": 2
+    },
+    {
+      "heroId": "e_trungquan",
+      "position": "MidLine",
+      "row": 2
+    }
+  ],
+  "enermy_1_3": [
+    {
+      "heroId": "e_tienquan",
+      "position": "FrontLine",
+      "row": 2
+    },
+    {
+      "heroId": "e_trungquan",
+      "position": "MidLine",
+      "row": 2
+    },
+    {
+      "heroId": "e_hauquan",
+      "position": "BackLine",
+      "row": 2
+    }
+  ]
+}

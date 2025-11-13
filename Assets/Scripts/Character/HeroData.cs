@@ -7,18 +7,27 @@ using UnityEngine;
 public class HeroData : ScriptableObject
 {
     public string heroName;
+    public int level = 1;
     public Sprite sprite;
     public RuntimeAnimatorController animatorController;
     [Header("Power Stats")]
-    public int maxHP = 100;
-    public int attack = 10;
-    public int speed = 10;
-    public int energy = 50;
     public Skill specialSkill;
 
+    // Core
+    public int maxHP, energy, speed;
+    public int physDmg, magicDmg, pureDmg;
+    public int physDef, magicDef, pureDef;
+
+    // Accuracy & Crit
+    public float accuracy, dodge, critChance, critDamage;
+
+    // Secondary
+    public float lifeSteal, blockChance, counterChance;
+
     [Header("Grid Position")]
-
-    public int column = 1;
-
+    public HeroColumn position = HeroColumn.MidLine;
     public int row = 1;
+
+    // Column is automatically determined by position
+    public int column => (int)position;
 }

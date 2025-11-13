@@ -9,6 +9,7 @@ public class EnergyBar : MonoBehaviour
     private TextMeshProUGUI currentManaText;
 
     private HeroUnit heroUnit;
+    private HeroSkillSystem skillSystem;
 
     // Start is called before the first frame update
     void Start()
@@ -17,25 +18,26 @@ public class EnergyBar : MonoBehaviour
         currentManaText = transform.Find("Canvas/currentMP").GetComponent<TextMeshProUGUI>();
 
 
-        // Find the HeroUnit component in parent hierarchy
+        // Find the HeroUnit and HeroSkillSystem components in parent hierarchy
         heroUnit = GetComponentInParent<HeroUnit>();
+        skillSystem = GetComponentInParent<HeroSkillSystem>();
 
-        if (heroUnit != null)
+        if (skillSystem != null)
         {
             // Subscribe to energy change events
-            heroUnit.OnEnergyChanged.AddListener(OnEnergyChanged);
+            skillSystem.OnEnergyChanged.AddListener(OnEnergyChanged);
 
             // Initialize with current energy
-            SetEnergy(heroUnit.CurrentEnergy);
+            SetEnergy(skillSystem.CurrentEnergy);
         }
     }
 
     void OnDestroy()
     {
         // Unsubscribe from events when destroyed
-        if (heroUnit != null)
+        if (skillSystem != null)
         {
-            heroUnit.OnEnergyChanged.RemoveListener(OnEnergyChanged);
+            skillSystem.OnEnergyChanged.RemoveListener(OnEnergyChanged);
         }
     }
 

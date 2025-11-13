@@ -121,16 +121,16 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 98669ea49f47bbb4d80419a7cbbaafc8, type: 3}
     - target: {fileID: 4392847823753145034, guid: 3367865b15a1048ad8c5c80283120ab6, type: 3}
       propertyPath: enemyTeam.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4392847823753145034, guid: 3367865b15a1048ad8c5c80283120ab6, type: 3}
       propertyPath: enemyTeam.Array.data[0]
       value: 
-      objectReference: {fileID: 11400000, guid: 5445e50b8b6a64a20a0db447507a1405, type: 2}
+      objectReference: {fileID: 11400000, guid: e4731b5c3be874addb801d31c7ed7c1d, type: 2}
     - target: {fileID: 4392847823753145034, guid: 3367865b15a1048ad8c5c80283120ab6, type: 3}
       propertyPath: enemyTeam.Array.data[1]
       value: 
-      objectReference: {fileID: 11400000, guid: fc07b4fa21ee6469f90e6c7d4e5d6bea, type: 2}
+      objectReference: {fileID: 11400000, guid: 7e1d978d9e67647038ee5a91a206064c, type: 2}
     - target: {fileID: 4392847823753145034, guid: 3367865b15a1048ad8c5c80283120ab6, type: 3}
       propertyPath: enemyTeam.Array.data[2]
       value: 

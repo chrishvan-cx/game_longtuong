@@ -1,0 +1,24 @@
+{
+  "playerTeam": [
+    {
+      "heroId": "hero_tienquan",
+      "position": "FrontLine",
+      "row": 2
+    },
+    {
+      "heroId": "hero_trungquan",
+      "position": "MidLine",
+      "row": 1
+    },
+    {
+      "heroId": "hero_hauquan",
+      "position": "BackLine",
+      "row": 3
+    }
+  ],
+  "playerStats": {
+    "level": 5,
+    "exp": 250,
+    "gold": 1000
+  }
+}

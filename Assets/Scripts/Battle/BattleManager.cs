@@ -62,7 +62,7 @@ public class BattleManager : MonoBehaviour
             if (teamASlots[i] != null)
             {
                 teamASlots[i].localScale = new Vector3(0.01f, 0.01f, 0.01f);
-                SetSlotPosition(teamASlots[i], playerData[i].column, playerData[i].row, "TeamLeft");
+                SetSlotPosition(teamASlots[i], playerData[i].position, playerData[i].row, "TeamLeft");
             }
 
             Vector3 spawnPos = teamASlots[i].position;
@@ -84,7 +84,7 @@ public class BattleManager : MonoBehaviour
             if (teamBSlots[i] != null)
             {
                 teamBSlots[i].localScale = new Vector3(0.01f, 0.01f, 0.01f);
-                SetSlotPosition(teamBSlots[i], enemyData[i].column, enemyData[i].row, "TeamRight");
+                SetSlotPosition(teamBSlots[i], enemyData[i].position, enemyData[i].row, "TeamRight");
             }
             Vector3 spawnPos = teamBSlots[i].position;
             // Set Z based on row for proper sorting (lower row = more forward = lower Z)
@@ -109,26 +109,58 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    private void SetSlotPosition(Transform slot, int column, int row, string team)
+    private void SetSlotPosition(Transform slot, HeroColumn column, int row, string team)
     {
         float posX = 0, posY = 0;
 
+        // Calculate X position based on column and team
         if (team == "TeamLeft")
         {
-            if (column == 1) posX = -3f;
-            else if (column == 2) posX = -4.5f;
-            else if (column == 3) posX = -6f;
+            switch (column)
+            {
+                case HeroColumn.FrontLine:
+                    posX = -3f;
+                    break;
+                case HeroColumn.MidLine:
+                    posX = -4.5f;
+                    break;
+                case HeroColumn.BackLine:
+                    posX = -6f;
+                    break;
+            }
         }
         else if (team == "TeamRight")
         {
-            if (column == 1) posX = 3f;
-            else if (column == 2) posX = 4.5f;
-            else if (column == 3) posX = 6f;
+            switch (column)
+            {
+                case HeroColumn.FrontLine:
+                    posX = 3f;
+                    break;
+                case HeroColumn.MidLine:
+                    posX = 4.5f;
+                    break;
+                case HeroColumn.BackLine:
+                    posX = 6f;
+                    break;
+            }
         }
 
-        if (row == 2) posY = 1f;
-        else if (row == 1) posY = -0.5f;
-        else if (row == 3) posY = 2.5f;
+        // Calculate Y position based on row
+        switch (row)
+        {
+            case 1:
+                posY = -0.5f;  // Bottom row
+                break;
+            case 2:
+                posY = 1f;     // Middle row
+                break;
+            case 3:
+                posY = 2.5f;   // Top row
+                break;
+            default:
+                posY = 1f;     // Default to middle
+                break;
+        }
 
         slot.position = new Vector3(posX, posY, 0);
         slot.localScale = new Vector3(0.01f, 0.01f, 0.01f);
@@ -197,6 +229,9 @@ public class BattleManager : MonoBehaviour
                 HeroUnit actor = PickNextActor();
                 if (actor == null) break; // Step 5: All heroes' h_round == round, round ends
 
+                // Check if battle ended (a team was eliminated)
+                if (battleEnded) break;
+
                 // Set turn state
                 actor.is_turn = true;
                 actor.h_round = round;
@@ -213,16 +248,19 @@ public class BattleManager : MonoBehaviour
                 if (aliveA.Count == 0)
                 {
                     EndBattle(1);
-                    break;
+                    yield break; // Exit coroutine immediately
                 }
                 if (aliveB.Count == 0)
                 {
                     EndBattle(0);
-                    break;
+                    yield break; // Exit coroutine immediately
                 }
 
-                // Step 4: Wait 0.5s after hero's attack is fully complete
-                yield return new WaitForSeconds(delayAfterAction);
+                // Step 4: Wait after hero's attack - but check if battle ended first
+                if (!battleEnded)
+                {
+                    yield return new WaitForSeconds(delayAfterAction);
+                }
             }
         }
     }
@@ -262,6 +300,11 @@ public class BattleManager : MonoBehaviour
     private void ResetAllHeroesToIdle()
     {
         // Intentionally left empty — heroes manage their own states now.
+    }
+
+    public bool IsBattleEnded()
+    {
+        return battleEnded;
     }
 
     private void EndBattle(int winningTeam)

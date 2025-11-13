@@ -5,19 +5,32 @@ using UnityEngine;
 public class AnimationEvent : MonoBehaviour
 {
     public HeroUnit heroUnit;
+    private HeroAnimator heroAnimator;
+
+    void Start()
+    {
+        // Get HeroAnimator component from heroUnit
+        if (heroUnit != null)
+        {
+            heroAnimator = heroUnit.GetComponent<HeroAnimator>();
+        }
+    }
 
     public void OnAttackAnimationComplete()
     {
-        heroUnit.OnAttackAnimationComplete();
+        if (heroAnimator != null)
+            heroAnimator.OnAttackAnimationComplete();
     }
 
     public void OnHitAnimationComplete()
     {
-        heroUnit.OnHitAnimationComplete();
+        if (heroAnimator != null)
+            heroAnimator.OnHitAnimationComplete();
     }
     
     public void OnAttackHit()
     {
-        heroUnit.OnAttackHit();
+        if (heroAnimator != null)
+            heroAnimator.OnAttackHit();
     }
 }

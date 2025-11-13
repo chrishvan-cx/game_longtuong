@@ -31,10 +31,26 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            
+            // Load player data from mock server on game start
+            InitializePlayerData();
         }
         else
         {
             Destroy(gameObject);
+        }
+    }
+    
+    private void InitializePlayerData()
+    {
+        // Load player data from mock server (or real server in production)
+        if (PlayerData.Instance != null)
+        {
+            PlayerData.Instance.LoadFromServer();
+        }
+        else
+        {
+            Debug.LogWarning("PlayerData not found! Make sure PlayerData GameObject exists in scene.");
         }
     }
 

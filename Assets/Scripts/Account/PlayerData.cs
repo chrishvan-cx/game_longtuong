@@ -148,12 +148,24 @@ public class PlayerData : MonoBehaviour
     }
 
     /// <summary>
-    /// Load player data from server (placeholder for now)
+    /// Load player data from server (now using mock data)
     /// </summary>
     public void LoadFromServer()
     {
-        // TODO: Fetch from server API
-        // For now, use default team set in inspector
+        // Load mock data
+        var mockData = MockServerData.LoadMockData();
+        
+        // Convert mock team to HeroData list
+        playerTeam = MockServerData.ConvertToHeroDataList(mockData.playerTeam);
+        
+        // Load player stats
+        if (mockData.playerStats != null)
+        {
+            playerLevel = mockData.playerStats.level;
+            playerExp = mockData.playerStats.exp;
+            playerGold = mockData.playerStats.gold;
+        }
+        
         OnPlayerDataChanged?.Invoke();
     }
 

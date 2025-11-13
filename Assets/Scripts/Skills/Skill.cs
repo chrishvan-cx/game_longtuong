@@ -2,12 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum SkillType
-{
-    Meteor,      // Falls from above to ground
-    Projectile   // Flies from caster to target
-}
-
 [CreateAssetMenu(fileName = "Skill", menuName = "TurnBased/Skill")]
 public class Skill : ScriptableObject
 {
