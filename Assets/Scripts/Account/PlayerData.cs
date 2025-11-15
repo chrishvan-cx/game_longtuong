@@ -56,6 +56,16 @@ public class PlayerData : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        // Auto-load mock data if playerTeam is empty (for testing)
+        if (playerTeam == null || playerTeam.Count == 0)
+        {
+            Debug.Log("PlayerTeam is empty, loading from mock data...");
+            LoadFromServer();
+        }
+    }
+
     private void LoadFromPlayerPrefs()
     {
         // Load saved data, or use inspector defaults
@@ -154,10 +164,13 @@ public class PlayerData : MonoBehaviour
     {
         // Load mock data
         var mockData = MockServerData.LoadMockData();
-        
-        // Convert mock team to HeroData list
-        playerTeam = MockServerData.ConvertToHeroDataList(mockData.playerTeam);
-        
+
+        // Load all owned heroes (with stats and heroRole set)
+        playerTeam = MockServerData.LoadOwnedHeroes(mockData.playerHeroes);
+
+        // Apply formation deployment data (set position/row for deployed heroes)
+        MockServerData.ApplyFormationData(playerTeam, mockData.playerFormation);
+
         // Load player stats
         if (mockData.playerStats != null)
         {
@@ -165,7 +178,9 @@ public class PlayerData : MonoBehaviour
             playerExp = mockData.playerStats.exp;
             playerGold = mockData.playerStats.gold;
         }
-        
+
+        Debug.Log($"[PlayerData] Loaded {playerTeam.Count} heroes, {GetDeployedHeroes().Count} deployed");
+
         OnPlayerDataChanged?.Invoke();
     }
 
@@ -175,5 +190,27 @@ public class PlayerData : MonoBehaviour
     public void SaveToServer()
     {
         // TODO: Send to server API
+    }
+
+    /// <summary>
+    /// Get heroes that are deployed in formation (row >= 1)
+    /// </summary>
+    public List<HeroData> GetDeployedHeroes()
+    {
+        List<HeroData> deployed = new List<HeroData>();
+
+        if (playerTeam == null)
+            return deployed;
+
+        foreach (var hero in playerTeam)
+        {
+            // Hero is deployed if they have a valid row (1-3)
+            if (hero != null && hero.row >= 1 && hero.row <= 3)
+            {
+                deployed.Add(hero);
+            }
+        }
+
+        return deployed;
     }
 }

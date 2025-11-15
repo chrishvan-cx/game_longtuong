@@ -52,9 +52,9 @@ public class BattleManager : MonoBehaviour
 
     void SpawnTeams()
     {
-        // Team A - use player team from PlayerData
-        List<HeroData> playerData = (PlayerData.Instance != null && PlayerData.Instance.playerTeam.Count > 0)
-            ? PlayerData.Instance.playerTeam
+        // Team A - use deployed heroes from formation (position != None)
+        List<HeroData> playerData = (PlayerData.Instance != null)
+            ? PlayerData.Instance.GetDeployedHeroes()
             : new List<HeroData>(); // fallback to empty if testing
 
         for (int i = 0; i < playerData.Count && i < teamASlots.Length; i++)

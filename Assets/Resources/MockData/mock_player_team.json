@@ -1,5 +1,22 @@
 {
-  "playerTeam": [
+  "playerHeroes": [
+    {
+      "heroId": "hero_tienquan"
+    },
+    {
+      "heroId": "hero_trungquan"
+    },
+    {
+      "heroId": "hero_hauquan"
+    },
+    {
+      "heroId": "hero_hauquan_2"
+    },
+    {
+      "heroId": "hero_hauquan_3"
+    }
+  ],
+  "playerFormation": [
     {
       "heroId": "hero_tienquan",
       "position": "FrontLine",

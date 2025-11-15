@@ -30,6 +30,7 @@ public enum TeamType
 
 public enum HeroColumn
 {
+    None = 0,       // Unassigned/Not deployed
     FrontLine = 1,  // Column 1
     MidLine = 2,    // Column 2
     BackLine = 3    // Column 3

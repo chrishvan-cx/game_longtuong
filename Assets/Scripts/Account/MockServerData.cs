@@ -10,8 +10,15 @@ public static class MockServerData
     [System.Serializable]
     public class MockPlayerTeamData
     {
-        public List<MockHeroEntry> playerTeam;
+        public List<MockHeroOwned> playerHeroes;      // All heroes player owns
+        public List<MockHeroEntry> playerFormation;   // Heroes deployed in formation
         public MockPlayerStats playerStats;
+    }
+
+    [System.Serializable]
+    public class MockHeroOwned
+    {
+        public string heroId;       // Maps to HeroData asset name
     }
 
     [System.Serializable]
@@ -44,7 +51,8 @@ public static class MockServerData
             Debug.LogWarning("Mock data file not found! Using default empty data.");
             return new MockPlayerTeamData
             {
-                playerTeam = new List<MockHeroEntry>(),
+                playerHeroes = new List<MockHeroOwned>(),
+                playerFormation = new List<MockHeroEntry>(),
                 playerStats = new MockPlayerStats()
             };
         }
@@ -52,6 +60,15 @@ public static class MockServerData
         try
         {
             MockPlayerTeamData data = JsonUtility.FromJson<MockPlayerTeamData>(jsonFile.text);
+
+            // Ensure lists are initialized
+            if (data.playerHeroes == null)
+                data.playerHeroes = new List<MockHeroOwned>();
+            if (data.playerFormation == null)
+                data.playerFormation = new List<MockHeroEntry>();
+            if (data.playerStats == null)
+                data.playerStats = new MockPlayerStats();
+
             return data;
         }
         catch (System.Exception e)
@@ -59,14 +76,74 @@ public static class MockServerData
             Debug.LogError($"Failed to parse mock data: {e.Message}");
             return new MockPlayerTeamData
             {
-                playerTeam = new List<MockHeroEntry>(),
+                playerHeroes = new List<MockHeroOwned>(),
+                playerFormation = new List<MockHeroEntry>(),
                 playerStats = new MockPlayerStats()
             };
         }
     }
 
     /// <summary>
-    /// Convert mock data to actual HeroData list
+    /// Load all owned heroes (for sidebar display)
+    /// Loads hero stats from mock_hero_stats.json - position/row from stats, not formation
+    /// </summary>
+    public static List<HeroData> LoadOwnedHeroes(List<MockHeroOwned> ownedHeroes)
+    {
+        List<HeroData> heroList = new List<HeroData>();
+
+        foreach (var entry in ownedHeroes)
+        {
+            // Try to load HeroData asset from Resources/Heroes folder
+            HeroData hero = Resources.Load<HeroData>($"Heroes/{entry.heroId}");
+
+            if (hero == null)
+            {
+                Debug.LogWarning($"Hero not found: {entry.heroId}");
+                continue;
+            }
+
+            // Load stats from mock server (includes role/position from stats file)
+            HeroStats stats = GetHeroStats(entry.heroId);
+            if (stats != null)
+            {
+                // Apply stats from mock server to HeroData
+                ApplyStatsToHeroData(hero, stats);
+            }
+            else
+            {
+                Debug.LogWarning($"Stats not found for hero: {entry.heroId}");
+            }
+
+            heroList.Add(hero);
+        }
+
+        return heroList;
+    }
+
+    /// <summary>
+    /// Apply formation deployment to heroes (set position/row from formation data)
+    /// </summary>
+    public static void ApplyFormationData(List<HeroData> heroes, List<MockHeroEntry> formation)
+    {
+        foreach (var formationEntry in formation)
+        {
+            // Find the hero in the heroes list
+            HeroData hero = heroes.Find(h => h.name.Contains(formationEntry.heroId));
+            if (hero != null)
+            {
+                // Apply formation position/row
+                hero.position = ParsePosition(formationEntry.position);
+                hero.row = formationEntry.row;
+            }
+            else
+            {
+                Debug.LogWarning($"Hero in formation not found in owned heroes: {formationEntry.heroId}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Convert mock data to actual HeroData list (legacy method for compatibility)
     /// Loads hero stats from mock_hero_stats.json and applies to HeroData
     /// </summary>
     public static List<HeroData> ConvertToHeroDataList(List<MockHeroEntry> mockTeam)
@@ -94,7 +171,9 @@ public static class MockServerData
             else
             {
                 // Fallback: Use position/row from team data if stats not found
-                hero.position = ParsePosition(entry.position);
+                HeroColumn parsedPosition = ParsePosition(entry.position);
+                hero.heroRole = parsedPosition; // Set permanent role
+                hero.position = parsedPosition; // Set current position
                 hero.row = entry.row;
             }
 
@@ -220,8 +299,10 @@ public static class MockServerData
         heroData.counterChance = stats.counterChance;
 
         // Apply position (convert string to enum)
-        heroData.position = stats.GetPosition();
-        heroData.row = stats.row;
+        HeroColumn parsedPosition = stats.GetPosition();
+        heroData.heroRole = parsedPosition; // Set permanent role from stats
+        heroData.position = parsedPosition; // Set current position (undeployed state)
+        heroData.row = 0; // Undeployed by default (formation data will override)
 
         // Apply skill (if specified)
         if (!string.IsNullOrEmpty(stats.specialSkillId))

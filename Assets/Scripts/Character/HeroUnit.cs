@@ -20,6 +20,11 @@ public class HeroUnit : MonoBehaviour
     public GameObject damagePopupPrefab;
     public Transform damagePopupSpawnPoint;
 
+    [Header("UI Views")]
+    public GameObject faceIconUI;
+    public SpriteRenderer faceIconRenderer;
+    public GameObject interfaceUI;
+
     [HideInInspector]
     public HeroData data;
 
@@ -48,6 +53,9 @@ public class HeroUnit : MonoBehaviour
 
     void Awake()
     {
+        // Default view: Interface visible, Face Icon hidden
+        SetViewMode(HeroViewMode.Interface);
+
         // Get or add component references
         combat = GetComponent<HeroCombat>();
         if (combat == null) combat = gameObject.AddComponent<HeroCombat>();
@@ -108,6 +116,12 @@ public class HeroUnit : MonoBehaviour
 
         if (nameText != null)
             nameText.text = data.heroName;
+
+        // Setup face icon
+        if (faceIconRenderer != null && data.sprite != null)
+        {
+            faceIconRenderer.sprite = data.sprite;
+        }
 
         SetHeroStationVisible(false);
         UpdateHPUI();
@@ -264,4 +278,25 @@ public class HeroUnit : MonoBehaviour
     {
         return BattleManager.Instance != null && BattleManager.Instance.IsBattleEnded();
     }
+
+    public void SetViewMode(HeroViewMode mode)
+    {
+        switch (mode)
+        {
+            case HeroViewMode.FaceIcon:
+                if (faceIconUI != null) faceIconUI.SetActive(true);
+                if (interfaceUI != null) interfaceUI.SetActive(false);
+                break;
+            case HeroViewMode.Interface:
+                if (faceIconUI != null) faceIconUI.SetActive(false);
+                if (interfaceUI != null) interfaceUI.SetActive(true);
+                break;
+        }
+    }
+}
+
+public enum HeroViewMode
+{
+    FaceIcon,
+    Interface
 }

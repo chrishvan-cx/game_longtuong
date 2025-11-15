@@ -25,7 +25,8 @@ public class HeroData : ScriptableObject
     public float lifeSteal, blockChance, counterChance;
 
     [Header("Grid Position")]
-    public HeroColumn position = HeroColumn.MidLine;
+    public HeroColumn heroRole = HeroColumn.MidLine; // Hero's permanent role/column type (never changes)
+    public HeroColumn position = HeroColumn.MidLine; // Current deployment position (changes when deployed/removed)
     public int row = 1;
 
     // Column is automatically determined by position
