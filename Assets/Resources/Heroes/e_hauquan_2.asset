@@ -10,29 +10,29 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af856c2d8e08d4998827a988258e0b97, type: 3}
-  m_Name: hero_trungquan
+  m_Name: e_hauquan_2
   m_EditorClassIdentifier: 
-  heroName: Hero Trung Quan
+  heroName: Enermy HauQuan
   level: 1
   sprite: {fileID: 0}
   animatorController: {fileID: 9100000, guid: 6bda1f5bf4224db44b12251ff5bfe8cb, type: 2}
-  specialSkill: {fileID: 11400000, guid: 94e0bd467dc054138b62b456bc9bdc0e, type: 2}
-  maxHP: 150
+  specialSkill: {fileID: 11400000, guid: 019dcedb1388a4a44aa1f93fad39e0d0, type: 2}
+  maxHP: 400
   energy: 50
-  speed: 120
-  physDmg: 100
-  magicDmg: 60
-  pureDmg: 15
-  physDef: 30
-  magicDef: 40
+  speed: 10
+  physDmg: 50
+  magicDmg: 50
+  pureDmg: 10
+  physDef: 0
+  magicDef: 25
   pureDef: 5
-  accuracy: 0.95
-  dodge: 0.2
-  critChance: 0.25
-  critDamage: 2
-  lifeSteal: 0.1
+  accuracy: 0
+  dodge: 0
+  critChance: 0
+  critDamage: 0
+  lifeSteal: 0
   blockChance: 0
   counterChance: 0
-  heroRole: 2
-  position: 2
-  row: 1
+  heroRole: 3
+  position: 3
+  row: 2

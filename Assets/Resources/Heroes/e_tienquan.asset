@@ -12,25 +12,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af856c2d8e08d4998827a988258e0b97, type: 3}
   m_Name: e_tienquan
   m_EditorClassIdentifier: 
-  heroName: Enermy TienQuan
+  heroName: Monster Tien Quan
+  level: 1
   sprite: {fileID: 0}
   animatorController: {fileID: 9100000, guid: 6bda1f5bf4224db44b12251ff5bfe8cb, type: 2}
-  specialSkill: {fileID: 11400000, guid: adae7bc68418e459aa9538a24fcd3fa5, type: 2}
-  maxHP: 500
+  specialSkill: {fileID: 11400000, guid: 94e0bd467dc054138b62b456bc9bdc0e, type: 2}
+  maxHP: 300
   energy: 50
-  speed: 10
-  physDmg: 50
+  speed: 80
+  physDmg: 70
   magicDmg: 50
   pureDmg: 10
-  physDef: 0
-  magicDef: 25
-  pureDef: 5
-  accuracy: 0
-  dodge: 0
-  critChance: 0
-  critDamage: 0
+  physDef: 70
+  magicDef: 60
+  pureDef: 20
+  accuracy: 0.85
+  dodge: 0.05
+  critChance: 0.1
+  critDamage: 1.5
   lifeSteal: 0
-  blockChance: 0
-  counterChance: 0
-  position: 2
+  blockChance: 0.2
+  counterChance: 0.15
+  heroRole: 1
+  position: 1
   row: 2

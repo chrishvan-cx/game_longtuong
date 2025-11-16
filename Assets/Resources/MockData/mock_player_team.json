@@ -7,7 +7,19 @@
       "heroId": "hero_trungquan"
     },
     {
+      "heroId": "hero_trungquan_2"
+    },
+    {
+      "heroId": "hero_trungquan_3"
+    },
+    {
       "heroId": "hero_hauquan"
+    },
+    {
+      "heroId": "hero_hauquan_2"
+    },
+    {
+      "heroId": "hero_hauquan_3"
     }
   ],
   "playerFormation": [
@@ -22,7 +34,17 @@
       "row": 1
     },
     {
+      "heroId": "hero_trungquan_3",
+      "position": "MidLine",
+      "row": 3
+    },
+    {
       "heroId": "hero_hauquan",
+      "position": "BackLine",
+      "row": 1
+    },
+    {
+      "heroId": "hero_hauquan_3",
       "position": "BackLine",
       "row": 3
     }

@@ -119,13 +119,35 @@ public class BattleManager : MonoBehaviour
             switch (column)
             {
                 case HeroColumn.FrontLine:
-                    posX = -3f;
+                    posX = -2f;
                     break;
                 case HeroColumn.MidLine:
-                    posX = -4.5f;
+                    if (row == 1)
+                    {
+                        posX = -5f;
+                    }
+                    else if (row == 2)
+                    {
+                        posX = -4.5f;
+                    }
+                    else if (row == 3)
+                    {
+                        posX = -4f;
+                    }
                     break;
                 case HeroColumn.BackLine:
-                    posX = -6f;
+                    if (row == 1)
+                    {
+                        posX = -7f;
+                    }
+                    else if (row == 2)
+                    {
+                        posX = -6.5f;
+                    }
+                    else if (row == 3)
+                    {
+                        posX = -6f;
+                    }
                     break;
             }
         }
@@ -134,13 +156,35 @@ public class BattleManager : MonoBehaviour
             switch (column)
             {
                 case HeroColumn.FrontLine:
-                    posX = 3f;
+                    posX = 2f;
                     break;
                 case HeroColumn.MidLine:
-                    posX = 4.5f;
+                    if (row == 1)
+                    {
+                        posX = 5f;
+                    }
+                    else if (row == 2)
+                    {
+                        posX = 4.5f;
+                    }
+                    else if (row == 3)
+                    {
+                        posX = 4f;
+                    }
                     break;
                 case HeroColumn.BackLine:
-                    posX = 6f;
+                    if (row == 1)
+                    {
+                        posX = 7f;
+                    }
+                    else if (row == 2)
+                    {
+                        posX = 6.5f;
+                    }
+                    else if (row == 3)
+                    {
+                        posX = 6f;
+                    }
                     break;
             }
         }
@@ -149,16 +193,16 @@ public class BattleManager : MonoBehaviour
         switch (row)
         {
             case 1:
-                posY = -0.5f;  // Bottom row
+                posY = -2.5f;  // Bottom row
                 break;
             case 2:
-                posY = 1f;     // Middle row
+                posY = -1.5f;     // Middle row
                 break;
             case 3:
-                posY = 2.5f;   // Top row
+                posY = -0.5f;   // Top row
                 break;
             default:
-                posY = 1f;     // Default to middle
+                posY = -1.5f;     // Default to middle
                 break;
         }
 

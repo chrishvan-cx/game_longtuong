@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: e_hauquan
   m_EditorClassIdentifier: 
   heroName: Enermy HauQuan
+  level: 1
   sprite: {fileID: 0}
   animatorController: {fileID: 9100000, guid: 6bda1f5bf4224db44b12251ff5bfe8cb, type: 2}
   specialSkill: {fileID: 11400000, guid: 019dcedb1388a4a44aa1f93fad39e0d0, type: 2}
@@ -32,5 +33,6 @@ MonoBehaviour:
   lifeSteal: 0
   blockChance: 0
   counterChance: 0
-  position: 2
-  row: 2
+  heroRole: 3
+  position: 3
+  row: 1

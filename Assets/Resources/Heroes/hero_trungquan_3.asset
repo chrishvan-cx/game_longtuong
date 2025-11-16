@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af856c2d8e08d4998827a988258e0b97, type: 3}
-  m_Name: hero_trungquan
+  m_Name: hero_trungquan_3
   m_EditorClassIdentifier: 
   heroName: Hero Trung Quan
   level: 1
@@ -35,4 +35,4 @@ MonoBehaviour:
   counterChance: 0
   heroRole: 2
   position: 2
-  row: 1
+  row: 3
