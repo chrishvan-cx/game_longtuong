@@ -794,23 +794,21 @@ public class FormationWindow : MonoBehaviour
     {
         if (heroUnit == null) return;
 
-        // Add SortingGroup to the root to control all renderers together
+        // Set sprites to render ABOVE Canvas UI
         SpriteRenderer[] spriteRenderers = heroUnit.GetComponentsInChildren<SpriteRenderer>(true);
         foreach (var sr in spriteRenderers)
         {
-            sr.sortingLayerName = heroUnitSortingLayer;
-            sr.sortingOrder = heroUnitSortOrder;
+            sr.sortingLayerName = "UI_HeroUnits"; // Above UI layer!
+            sr.sortingOrder = 105;
         }
 
+        // Set child canvases (health/energy bars)
         Canvas[] canvases = heroUnit.GetComponentsInChildren<Canvas>(true);
         foreach (var canvas in canvases)
         {
-            if (canvas.renderMode == RenderMode.WorldSpace)
-            {
-                canvas.overrideSorting = true;
-                canvas.sortingLayerName = heroUnitSortingLayer;
-                canvas.sortingOrder = heroUnitSortOrder;
-            }
+            canvas.overrideSorting = true;
+            canvas.sortingLayerName = "UI_HeroUnits";
+            canvas.sortingOrder = 115;
         }
     }
 }

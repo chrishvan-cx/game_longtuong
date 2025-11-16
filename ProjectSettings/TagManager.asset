@@ -64,6 +64,9 @@ TagManager:
   - name: UI
     uniqueID: 1277283687
     locked: 0
+  - name: UI_HeroUnits
+    uniqueID: 4225320179
+    locked: 0
   - name: 'UI_World '
     uniqueID: 437925293
     locked: 0
