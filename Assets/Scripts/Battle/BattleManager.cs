@@ -62,7 +62,9 @@ public class BattleManager : MonoBehaviour
             if (teamASlots[i] != null)
             {
                 teamASlots[i].localScale = new Vector3(0.01f, 0.01f, 0.01f);
-                SetSlotPosition(teamASlots[i], playerData[i].position, playerData[i].row, "TeamLeft");
+                // SetSlotPosition(teamASlots[i], playerData[i].position, playerData[i].row, "TeamLeft");
+                SetSlotPosition(teamASlots[i], playerData[i].heroRole, playerData[i].row, "TeamLeft");
+
             }
 
             Vector3 spawnPos = teamASlots[i].position;
@@ -84,7 +86,9 @@ public class BattleManager : MonoBehaviour
             if (teamBSlots[i] != null)
             {
                 teamBSlots[i].localScale = new Vector3(0.01f, 0.01f, 0.01f);
-                SetSlotPosition(teamBSlots[i], enemyData[i].position, enemyData[i].row, "TeamRight");
+                // SetSlotPosition(teamBSlots[i], enemyData[i].position, enemyData[i].row, "TeamRight");
+                SetSlotPosition(teamBSlots[i], enemyData[i].heroRole, enemyData[i].row, "TeamRight");
+
             }
             Vector3 spawnPos = teamBSlots[i].position;
             // Set Z based on row for proper sorting (lower row = more forward = lower Z)
@@ -122,32 +126,14 @@ public class BattleManager : MonoBehaviour
                     posX = -2f;
                     break;
                 case HeroColumn.MidLine:
-                    if (row == 1)
-                    {
-                        posX = -5f;
-                    }
-                    else if (row == 2)
-                    {
-                        posX = -4.5f;
-                    }
-                    else if (row == 3)
-                    {
-                        posX = -4f;
-                    }
+                    if (row == 1) posX = -5f;
+                    else if (row == 2) posX = -4.5f;
+                    else if (row == 3) posX = -4f;
                     break;
                 case HeroColumn.BackLine:
-                    if (row == 1)
-                    {
-                        posX = -7f;
-                    }
-                    else if (row == 2)
-                    {
-                        posX = -6.5f;
-                    }
-                    else if (row == 3)
-                    {
-                        posX = -6f;
-                    }
+                    if (row == 1) posX = -7f;
+                    else if (row == 2) posX = -6.5f;
+                    else if (row == 3) posX = -6f;
                     break;
             }
         }
@@ -159,65 +145,40 @@ public class BattleManager : MonoBehaviour
                     posX = 2f;
                     break;
                 case HeroColumn.MidLine:
-                    if (row == 1)
-                    {
-                        posX = 5f;
-                    }
-                    else if (row == 2)
-                    {
-                        posX = 4.5f;
-                    }
-                    else if (row == 3)
-                    {
-                        posX = 4f;
-                    }
+                    if (row == 1) posX = 5f;
+                    else if (row == 2) posX = 4.5f;
+                    else if (row == 3) posX = 4f;
                     break;
                 case HeroColumn.BackLine:
-                    if (row == 1)
-                    {
-                        posX = 7f;
-                    }
-                    else if (row == 2)
-                    {
-                        posX = 6.5f;
-                    }
-                    else if (row == 3)
-                    {
-                        posX = 6f;
-                    }
+                    if (row == 1) posX = 7f;
+                    else if (row == 2) posX = 6.5f;
+                    else if (row == 3) posX = 6f;
                     break;
             }
         }
 
-        // Calculate Y position based on row
+        // Calculate Y position
         switch (row)
         {
-            case 1:
-                posY = -2.5f;  // Bottom row
-                break;
-            case 2:
-                posY = -1.5f;     // Middle row
-                break;
-            case 3:
-                posY = -0.5f;   // Top row
-                break;
-            default:
-                posY = -1.5f;     // Default to middle
-                break;
+            case 1: posY = -2.5f; break;
+            case 2: posY = -1.5f; break;
+            case 3: posY = -0.5f; break;
+            default: posY = -1.5f; break;
         }
 
         slot.position = new Vector3(posX, posY, 0);
-        slot.localScale = new Vector3(0.01f, 0.01f, 0.01f);
-        BoxCollider box = slot.GetComponent<BoxCollider>();
-        if (box == null)
-        {
-            box = slot.gameObject.AddComponent<BoxCollider>();
-            box.size = new Vector3(100, 100, 1);
-        }
-        else
-        {
-            box.size = new Vector3(100, 100, 1);
-        }
+
+        // slot.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+        // BoxCollider box = slot.GetComponent<BoxCollider>();
+        // if (box == null)
+        // {
+        //     box = slot.gameObject.AddComponent<BoxCollider>();
+        //     box.size = new Vector3(100, 100, 1);
+        // }
+        // else
+        // {
+        //     box.size = new Vector3(100, 100, 1);
+        // }
     }
 
     private IEnumerator BattleLoop()

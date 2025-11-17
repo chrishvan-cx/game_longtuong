@@ -1,38 +1,70 @@
 {
-  "enermy_1_1": [
+  "monster_map_1": [
     {
-      "heroId": "e_tienquan",
-      "position": "FrontLine",
+      "heroId": "e_tien01",
       "row": 2
     }
   ],
-  "enermy_1_2": [
+  "monster_map_2": [
     {
-      "heroId": "e_tienquan",
-      "position": "FrontLine",
+      "heroId": "e_tien01",
       "row": 2
     },
     {
-      "heroId": "e_trungquan",
-      "position": "MidLine",
+      "heroId": "e_tq01",
+      "row": 1
+    }
+  ],
+  "monster_map_3": [
+    {
+      "heroId": "e_tien01",
+      "row": 2
+    },
+    {
+      "heroId": "e_tq01",
+      "row": 2
+    },
+    {
+      "heroId": "e_hq01",
       "row": 2
     }
   ],
-  "enermy_1_3": [
+  "monster_mountain_1": [
     {
-      "heroId": "e_tienquan",
-      "position": "FrontLine",
+      "heroId": "e_tien01",
+      "row": 1
+    },
+    {
+      "heroId": "e_tq01",
+      "row": 3
+    }
+  ],
+  "monster_mountain_2": [
+    {
+      "heroId": "e_tien01",
       "row": 2
     },
     {
-      "heroId": "e_trungquan",
-      "position": "MidLine",
+      "heroId": "e_tq01",
+      "row": 1
+    },
+    {
+      "heroId": "e_hq01",
+      "row": 3
+    }
+  ],
+  "monster_tower_1": [
+    {
+      "heroId": "e_tien01",
+      "row": 1
+    },
+    {
+      "heroId": "e_tq01",
       "row": 2
     },
     {
-      "heroId": "e_hauquan",
-      "position": "BackLine",
-      "row": 2
+      "heroId": "e_hq01",
+      "row": 3
     }
   ]
 }

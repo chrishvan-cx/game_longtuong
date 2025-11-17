@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af856c2d8e08d4998827a988258e0b97, type: 3}
   m_Name: Hero1-2
   m_EditorClassIdentifier: 
+  heroId: 
   heroName: Britney Spear
+  level: 1
   sprite: {fileID: 0}
   animatorController: {fileID: 9100000, guid: 6bda1f5bf4224db44b12251ff5bfe8cb, type: 2}
   specialSkill: {fileID: 11400000, guid: adae7bc68418e459aa9538a24fcd3fa5, type: 2}
-  maxHP: 100
+  maxHP: 50
   energy: 50
   speed: 10
   physDmg: 0
@@ -32,5 +34,6 @@ MonoBehaviour:
   lifeSteal: 0
   blockChance: 0
   counterChance: 0
+  heroRole: 2
   position: 1
   row: 2

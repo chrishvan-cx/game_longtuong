@@ -8,23 +8,22 @@ using UnityEngine;
 public class HeroVisualData : ScriptableObject
 {
     [Header("Identity")]
-    public string heroId;           // Unique ID for server lookup
-    public string heroName;         // Display name
-    
-    [Header("Visuals")]
-    public Sprite sprite;           // Character portrait
+    public string heroId; // For matching with JSON data
+
+    [Header("Visuals Only")]
+    public Sprite sprite;
     public GameObject modelPrefab;  // 3D model (optional)
     public RuntimeAnimatorController animatorController;
-    
+
     [Header("VFX")]
     public GameObject hitVFX;
     public GameObject deathVFX;
-    
+
     [Header("Audio")]
     public AudioClip[] attackSounds;
     public AudioClip[] hitSounds;
     public AudioClip deathSound;
-    
+
     // NO STATS HERE!
     // Stats come from server to prevent cheating
 }

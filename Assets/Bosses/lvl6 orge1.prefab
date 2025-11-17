@@ -120,6 +120,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: 98669ea49f47bbb4d80419a7cbbaafc8, type: 3}
     - target: {fileID: 4392847823753145034, guid: 3367865b15a1048ad8c5c80283120ab6, type: 3}
+      propertyPath: enemyTeamId
+      value: monster_map_3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392847823753145034, guid: 3367865b15a1048ad8c5c80283120ab6, type: 3}
       propertyPath: requiredMapLevel
       value: 1
       objectReference: {fileID: 0}

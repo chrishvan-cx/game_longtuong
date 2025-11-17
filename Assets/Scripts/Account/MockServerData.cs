@@ -85,7 +85,7 @@ public static class MockServerData
 
     /// <summary>
     /// Load all owned heroes (for sidebar display)
-    /// Loads hero stats from mock_hero_stats.json - position/row from stats, not formation
+    /// Combines HeroVisualData + HeroStats
     /// </summary>
     public static List<HeroData> LoadOwnedHeroes(List<MockHeroOwned> ownedHeroes)
     {
@@ -93,28 +93,28 @@ public static class MockServerData
 
         foreach (var entry in ownedHeroes)
         {
-            // Try to load HeroData asset from Resources/Heroes folder
-            HeroData hero = Resources.Load<HeroData>($"Heroes/{entry.heroId}");
+            // ✅ Load visual data from Resources
+            HeroVisualData visualTemplate = Resources.Load<HeroVisualData>($"Heroes/{entry.heroId}");
 
-            if (hero == null)
+            if (visualTemplate == null)
             {
-                Debug.LogWarning($"Hero not found: {entry.heroId}");
+                Debug.LogWarning($"Hero visual data not found: {entry.heroId}");
                 continue;
             }
 
-            // Load stats from mock server (includes role/position from stats file)
-            HeroStats stats = GetHeroStats(entry.heroId);
-            if (stats != null)
-            {
-                // Apply stats from mock server to HeroData
-                ApplyStatsToHeroData(hero, stats);
-            }
-            else
-            {
-                Debug.LogWarning($"Stats not found for hero: {entry.heroId}");
-            }
+            // Create copy of visual data
+            HeroVisualData visual = Object.Instantiate(visualTemplate);
 
-            heroList.Add(hero);
+            // Load stats from JSON
+            HeroStats stats = GetHeroStats(entry.heroId);
+
+            // Create HeroData
+            HeroData hero = CreateHeroFromVisualAndStats(visual, stats);
+
+            if (hero != null)
+            {
+                heroList.Add(hero);
+            }
         }
 
         return heroList;
@@ -125,26 +125,52 @@ public static class MockServerData
     /// </summary>
     public static void ApplyFormationData(List<HeroData> heroes, List<MockHeroEntry> formation)
     {
+        Debug.Log($"[FORMATION] Applying formation data to {heroes.Count} heroes");
+
         foreach (var formationEntry in formation)
         {
-            // Find the hero in the heroes list
-            HeroData hero = heroes.Find(h => h.name.Contains(formationEntry.heroId));
+            // Find the hero in the heroes list by heroId
+            HeroData hero = heroes.Find(h => h.heroId == formationEntry.heroId);
+
             if (hero != null)
             {
-                // Apply formation position/row
-                hero.position = ParsePosition(formationEntry.position);
+                // ✅ Apply formation row only (heroRole is set from stats, not formation)
                 hero.row = formationEntry.row;
+
+                Debug.Log($"[FORMATION] ✅ Deployed {hero.heroName} (Role: {hero.heroRole}) to Row {formationEntry.row}");
             }
             else
             {
-                Debug.LogWarning($"Hero in formation not found in owned heroes: {formationEntry.heroId}");
+                Debug.LogWarning($"[FORMATION] ❌ Hero NOT FOUND: {formationEntry.heroId}");
             }
+        }
+
+        // Debug: Print final state
+        Debug.Log("[FORMATION] Final hero states:");
+        foreach (var h in heroes)
+        {
+            Debug.Log($"[FORMATION] {h.heroName}: heroRole={h.heroRole}, row={h.row}");
         }
     }
 
+
     /// <summary>
-    /// Convert mock data to actual HeroData list (legacy method for compatibility)
-    /// Loads hero stats from mock_hero_stats.json and applies to HeroData
+    /// Map heroId to actual file name (if they differ)
+    /// </summary>
+    private static string GetHeroFileName(string heroId)
+    {
+        // Add mappings here if file names don't match heroIds
+        Dictionary<string, string> idToFileName = new Dictionary<string, string>
+        {
+            // Example: { "hero_tienquan", "TienQuanHero" }
+            // If file name matches ID, no need to add mapping
+        };
+
+        return idToFileName.ContainsKey(heroId) ? idToFileName[heroId] : heroId;
+    }
+    /// <summary>
+    /// Convert mock enemy team data to HeroData list
+    /// Uses HeroVisualData + HeroStats (from JSON)
     /// </summary>
     public static List<HeroData> ConvertToHeroDataList(List<MockHeroEntry> mockTeam)
     {
@@ -152,36 +178,106 @@ public static class MockServerData
 
         foreach (var entry in mockTeam)
         {
-            // Try to load HeroData asset from Resources/Heroes folder
-            HeroData hero = Resources.Load<HeroData>($"Heroes/{entry.heroId}");
+            // ✅ Load visual data from Resources/Heroes folder
+            HeroVisualData visualTemplate = Resources.Load<HeroVisualData>($"Heroes/{entry.heroId}");
 
-            if (hero == null)
+            if (visualTemplate == null)
             {
-                Debug.LogWarning($"Hero not found: {entry.heroId}");
+                Debug.LogWarning($"Hero visual data not found: {entry.heroId}");
                 continue;
             }
 
-            // Load stats from mock server
+            // ✅ Create runtime HeroData (instantiate ScriptableObject to get a copy)
+            HeroVisualData visual = Object.Instantiate(visualTemplate);
+
+            // Load stats from mock server (JSON)
             HeroStats stats = GetHeroStats(entry.heroId);
-            if (stats != null)
+
+            // ✅ Create new HeroData by combining visual + stats
+            HeroData hero = CreateHeroFromVisualAndStats(visual, stats);
+
+            if (hero != null)
             {
-                // Apply stats from mock server to HeroData
-                ApplyStatsToHeroData(hero, stats);
+                // Override with formation data from mockTeam
+                hero.row = entry.row;
+                heroList.Add(hero);
             }
             else
             {
-                // Fallback: Use position/row from team data if stats not found
-                HeroColumn parsedPosition = ParsePosition(entry.position);
-                hero.heroRole = parsedPosition; // Set permanent role
-                hero.position = parsedPosition; // Set current position
-                hero.row = entry.row;
+                Debug.LogWarning($"Failed to create hero: {entry.heroId}");
             }
-
-            heroList.Add(hero);
         }
 
         return heroList;
     }
+
+    /// <summary>
+    /// Helper method to create HeroData from HeroVisualData + HeroStats
+    /// </summary>
+    private static HeroData CreateHeroFromVisualAndStats(HeroVisualData visual, HeroStats stats)
+    {
+        if (visual == null)
+        {
+            Debug.LogError("Visual data is null!");
+            return null;
+        }
+
+        // ✅ Create new HeroData ScriptableObject instance
+        HeroData hero = ScriptableObject.CreateInstance<HeroData>();
+        // Below is for Production
+        // HeroData hero = new HeroData();
+
+        // Apply visual data
+        hero.heroId = visual.heroId;
+        hero.sprite = visual.sprite;
+        hero.animatorController = visual.animatorController;
+
+        // Apply stats if available
+        if (stats != null)
+        {
+            ApplyStatsToHeroData(hero, stats);
+
+            // Below is for Production
+            // hero.heroName = stats.heroName;
+            // hero.level = stats.level;
+            // hero.maxHP = stats.maxHP;
+            // hero.energy = stats.energy;
+            // hero.speed = stats.speed;
+            // hero.physDmg = stats.physicalDmg;
+            // hero.magicDmg = stats.magicDmg;
+            // hero.pureDmg = stats.pureDmg;
+            // hero.physDef = stats.physicalDef;
+            // hero.magicDef = stats.magicDef;
+            // hero.pureDef = stats.pureDef;
+            // hero.accuracy = stats.accuracy;
+            // hero.dodge = stats.dodge;
+            // hero.critChance = stats.critChance;
+            // hero.critDamage = stats.critDamage;
+            // hero.lifeSteal = stats.lifeSteal;
+            // hero.blockChance = stats.blockChance;
+            // hero.counterChance = stats.counterChance;
+            // hero.heroRole = stats.GetPosition();
+            // hero.row = 0;
+
+            // // Load skill
+            // if (!string.IsNullOrEmpty(stats.specialSkillId))
+            // {
+            //     hero.specialSkill = Resources.Load<Skill>($"Skills/{stats.specialSkillId}");
+            // }
+        }
+        else
+        {
+            // Fallback: use default values
+            Debug.LogWarning($"Stats not found for hero: {visual.heroId}, using defaults");
+            hero.heroName = visual.heroId;
+            hero.heroRole = HeroColumn.MidLine;
+            hero.row = 0;
+        }
+
+        return hero;
+    }
+
+
 
     /// <summary>
     /// Parse position string to enum
@@ -298,11 +394,12 @@ public static class MockServerData
         heroData.blockChance = stats.blockChance;
         heroData.counterChance = stats.counterChance;
 
-        // Apply position (convert string to enum)
-        HeroColumn parsedPosition = stats.GetPosition();
-        heroData.heroRole = parsedPosition; // Set permanent role from stats
-        heroData.position = parsedPosition; // Set current position (undeployed state)
-        heroData.row = 0; // Undeployed by default (formation data will override)
+        // ✅ FIX: Set heroRole (permanent class) from stats
+        HeroColumn parsedRole = stats.GetPosition();
+        heroData.heroRole = parsedRole;
+
+        // ✅ FIX: Initialize as UNDEPLOYED (formation will override if deployed)
+        heroData.row = 0; // 0 = not deployed
 
         // Apply skill (if specified)
         if (!string.IsNullOrEmpty(stats.specialSkillId))
@@ -314,14 +411,26 @@ public static class MockServerData
             }
             else
             {
-                Debug.LogWarning($"Skill not founds: {stats.specialSkillId}");
+                Debug.LogWarning($"Skill not found: {stats.specialSkillId}");
             }
         }
     }
-
     // ═══════════════════════════════════════════════════════════
     // ENEMY TEAM LOADING
     // ═══════════════════════════════════════════════════════════
+    [System.Serializable]
+    public class EnemyFormationData
+    {
+        public string heroId;
+        public int row;
+        // heroRole is NOT needed here - comes from stats!
+    }
+
+    [System.Serializable]
+    public class EnemyTeamWrapper
+    {
+        public List<EnemyFormationData> team;
+    }
 
     [System.Serializable]
     public class EnemyTeamData
@@ -331,6 +440,7 @@ public static class MockServerData
 
     /// <summary>
     /// Load enemy team by ID from mock_enemy_team.json
+    /// Format: { "monster_map_1": [...], "monster_mountain_2": [...] }
     /// </summary>
     public static List<HeroData> LoadEnemyTeam(string teamId)
     {
@@ -344,11 +454,9 @@ public static class MockServerData
 
         try
         {
-            // Parse the JSON manually to get specific team
             string json = jsonFile.text;
 
-            // Extract the specific team from JSON
-            // Format: { "enermy_1_1": [...], "enermy_1_2": [...] }
+            // Find the team by ID
             string searchKey = $"\"{teamId}\"";
             int startIndex = json.IndexOf(searchKey);
 
@@ -373,10 +481,10 @@ public static class MockServerData
 
             // Wrap in a structure JsonUtility can parse
             string wrappedJson = $"{{\"team\":{arrayContent}}}";
-            EnemyTeamData teamData = JsonUtility.FromJson<EnemyTeamData>(wrappedJson);
+            EnemyTeamWrapper teamData = JsonUtility.FromJson<EnemyTeamWrapper>(wrappedJson);
 
             // Convert to HeroData list
-            List<HeroData> enemyTeam = ConvertToHeroDataList(teamData.team);
+            List<HeroData> enemyTeam = ConvertEnemyFormationToHeroData(teamData.team);
             return enemyTeam;
         }
         catch (System.Exception e)
@@ -384,5 +492,51 @@ public static class MockServerData
             Debug.LogError($"Failed to load enemy team '{teamId}': {e.Message}");
             return new List<HeroData>();
         }
+    }
+
+    /// <summary>
+    /// Convert enemy formation data to HeroData list
+    /// Loads stats from mock_hero_stats.json + visuals from Resources
+    /// </summary>
+    private static List<HeroData> ConvertEnemyFormationToHeroData(List<EnemyFormationData> formation)
+    {
+        List<HeroData> heroList = new List<HeroData>();
+
+        foreach (var entry in formation)
+        {
+            // Load visual data from Resources
+            HeroVisualData visualTemplate = Resources.Load<HeroVisualData>($"Heroes/{entry.heroId}");
+
+            if (visualTemplate == null)
+            {
+                Debug.LogWarning($"Enemy visual data not found: {entry.heroId}");
+                continue;
+            }
+
+            HeroVisualData visual = Object.Instantiate(visualTemplate);
+
+            // Load stats from JSON (this includes heroRole!)
+            HeroStats stats = GetHeroStats(entry.heroId);
+
+            if (stats == null)
+            {
+                Debug.LogWarning($"Enemy stats not found: {entry.heroId}");
+                continue;
+            }
+
+            // Create HeroData
+            HeroData hero = CreateHeroFromVisualAndStats(visual, stats);
+
+            if (hero != null)
+            {
+                // ✅ Only apply row from formation, heroRole comes from stats!
+                hero.row = entry.row;
+                heroList.Add(hero);
+
+                Debug.Log($"[ENEMY] Loaded {hero.heroName} (Role: {hero.heroRole}, Row: {hero.row})");
+            }
+        }
+
+        return heroList;
     }
 }

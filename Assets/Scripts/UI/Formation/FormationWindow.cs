@@ -241,22 +241,19 @@ public class FormationWindow : MonoBehaviour
         heroToSlot.Clear();
         deployedCount = 0;
 
-        // Place heroes based on saved position/row
-        foreach (var hero in PlayerData.Instance.playerTeam)
+        // ✅ Get deployed heroes (row >= 1)
+        List<HeroData> deployedHeroes = PlayerData.Instance.GetDeployedHeroes();
+
+        foreach (var hero in deployedHeroes)
         {
-            // Only place deployed heroes (row >= 1)
-            if (hero.row >= 1 && hero.row <= 3)
+            // Find matching slot using heroRole (not position!)
+            FormationSlot targetSlot = FindSlot(hero.heroRole, hero.row);
+            if (targetSlot != null)
             {
-                // Find matching slot
-                FormationSlot targetSlot = FindSlot(hero.position, hero.row);
-                if (targetSlot != null)
-                {
-                    AssignHeroToSlot(hero, targetSlot, false);
-                }
+                AssignHeroToSlot(hero, targetSlot, false);
             }
         }
 
-        // Refresh sidebar cards to show deployed status
         RefreshSidebarCards();
     }
 
@@ -314,10 +311,10 @@ public class FormationWindow : MonoBehaviour
             heroColumn = hero.heroRole;
         }
 
-        // Validate column match
-        if (targetSlot.column != heroColumn)
+        // ✅ Column restriction: hero can only go to slots matching their heroRole
+        if (targetSlot.column != hero.heroRole)
         {
-            Debug.Log($"Cannot place {hero.heroName} (role: {heroColumn}) in {targetSlot.column} slot!");
+            Debug.Log($"Cannot place {hero.heroName} (role: {hero.heroRole}) in {targetSlot.column} slot!");
             return false;
         }
 
@@ -391,8 +388,7 @@ public class FormationWindow : MonoBehaviour
         slotToHero[slot] = hero;
         heroToSlot[hero] = slot;
 
-        // Update hero data
-        hero.position = slot.column;
+        // ✅ Update hero data (heroRole stays the same, only row changes)
         hero.row = slot.row;
 
         // Create HeroUnit in the slot for battle preview
@@ -445,8 +441,7 @@ public class FormationWindow : MonoBehaviour
         slotToHero.Remove(slot);
         heroToSlot.Remove(hero);
 
-        // Update hero data - restore to original role position
-        hero.position = hero.heroRole; // Restore to permanent role instead of None
+        // ✅ Update hero data (heroRole stays the same, row = 0 = undeployed)
         hero.row = 0;
 
         // Destroy the card in the slot
@@ -499,10 +494,8 @@ public class FormationWindow : MonoBehaviour
         heroToSlot.Remove(heroA);
         heroToSlot.Remove(heroB);
 
-        // Update hero data
-        heroA.position = slotB.column;
+        // ✅ Update hero data - ONLY change row, heroRole stays the same
         heroA.row = slotB.row;
-        heroB.position = slotA.column;
         heroB.row = slotA.row;
 
         // Update mappings
@@ -699,23 +692,10 @@ public class FormationWindow : MonoBehaviour
         if (hero == null)
             return false;
 
-        // Column restriction: hero can only go to slots of their role type
-        HeroColumn heroColumn;
-        if (heroToSlot.ContainsKey(hero))
+        // ✅ Check if slot column matches hero role
+        if (slot.column != hero.heroRole)
         {
-            // Hero is already deployed - use their current slot's column
-            heroColumn = heroToSlot[hero].column;
-        }
-        else
-        {
-            // Hero from sidebar - use their permanent role
-            heroColumn = hero.heroRole;
-        }
-
-        // Check if slot column matches hero role
-        if (slot.column != heroColumn)
-        {
-            return false; // Wrong column type
+            return false;
         }
 
         // If hero is already placed (moving), allow movement within same column

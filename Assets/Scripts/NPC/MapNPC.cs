@@ -18,8 +18,8 @@ public class MapNPC : MonoBehaviour, IPointerClickHandler
     public List<ItemReward> itemRewards = new List<ItemReward>();
 
     [Header("Enemy Team")]
-    public string enemyTeamId = "enermy_1_1";  // ID to load from JSON
-    public List<HeroData> enemyTeam = new List<HeroData>();  // Will be loaded from JSON
+    public string enemyTeamId = "monster_map_1";  // ← Set this in Inspector
+    public List<HeroData> enemyTeam = new List<HeroData>();
 
     [Header("UI References")]
     public TMP_Text textNameAndLevel;
@@ -95,18 +95,23 @@ public class MapNPC : MonoBehaviour, IPointerClickHandler
     {
         if (string.IsNullOrEmpty(enemyTeamId))
         {
-            Debug.LogWarning($"[{npcName}] No enemyTeamId set, using empty team");
+            Debug.LogWarning($"[{npcName}] No enemyTeamId set");
             return;
         }
 
-        // Load enemy team from mock data
+        // ✅ Load enemy team using the teamId
         enemyTeam = MockServerData.LoadEnemyTeam(enemyTeamId);
-        
+
         if (enemyTeam.Count == 0)
         {
             Debug.LogWarning($"[{npcName}] Failed to load enemy team '{enemyTeamId}'");
         }
+        else
+        {
+            Debug.Log($"[{npcName}] Loaded {enemyTeam.Count} enemies from '{enemyTeamId}'");
+        }
     }
+
 
     // IPointerClickHandler implementation
     public void OnPointerClick(PointerEventData eventData)

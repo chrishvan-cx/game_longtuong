@@ -12,18 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af856c2d8e08d4998827a988258e0b97, type: 3}
   m_Name: Hero2-2
   m_EditorClassIdentifier: 
+  heroId: 
   heroName: Ronaldo
+  level: 1
   sprite: {fileID: 0}
   animatorController: {fileID: 9100000, guid: 6bda1f5bf4224db44b12251ff5bfe8cb, type: 2}
-  energy: 50
   specialSkill: {fileID: 11400000, guid: 019dcedb1388a4a44aa1f93fad39e0d0, type: 2}
-  physicalDmg: 100
+  maxHP: 45
+  energy: 50
+  speed: 13
+  physDmg: 0
   magicDmg: 50
   pureDmg: 10
-  physicalDef: 50
+  physDef: 0
   magicDef: 25
   pureDef: 5
-  speed: 13
-  maxHP: 100
-  column: 2
+  accuracy: 0
+  dodge: 0
+  critChance: 0
+  critDamage: 0
+  lifeSteal: 0
+  blockChance: 0
+  counterChance: 0
+  heroRole: 2
+  position: 2
   row: 2

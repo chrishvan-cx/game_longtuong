@@ -1,51 +1,41 @@
 {
   "playerHeroes": [
     {
-      "heroId": "hero_tienquan"
+      "heroId": "h_tien01"
     },
     {
-      "heroId": "hero_trungquan"
+      "heroId": "h_tq01"
     },
     {
-      "heroId": "hero_trungquan_2"
+      "heroId": "h_tq02"
     },
     {
-      "heroId": "hero_trungquan_3"
+      "heroId": "h_tq03"
     },
     {
-      "heroId": "hero_hauquan"
+      "heroId": "h_hq01"
     },
     {
-      "heroId": "hero_hauquan_2"
+      "heroId": "h_hq02"
     },
     {
-      "heroId": "hero_hauquan_3"
+      "heroId": "h_hq03"
     }
   ],
   "playerFormation": [
     {
-      "heroId": "hero_tienquan",
+      "heroId": "h_tien01",
       "position": "FrontLine",
       "row": 2
     },
     {
-      "heroId": "hero_trungquan",
+      "heroId": "h_tq01",
       "position": "MidLine",
       "row": 1
     },
     {
-      "heroId": "hero_trungquan_3",
+      "heroId": "h_tq03",
       "position": "MidLine",
-      "row": 3
-    },
-    {
-      "heroId": "hero_hauquan",
-      "position": "BackLine",
-      "row": 1
-    },
-    {
-      "heroId": "hero_hauquan_3",
-      "position": "BackLine",
       "row": 3
     }
   ],

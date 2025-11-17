@@ -165,10 +165,12 @@ public class PlayerData : MonoBehaviour
         // Load mock data
         var mockData = MockServerData.LoadMockData();
 
-        // Load all owned heroes (with stats and heroRole set)
+        // ✅ STEP 1: Load all owned heroes (UNDEPLOYED by default)
+        // These heroes will have row=0 initially
         playerTeam = MockServerData.LoadOwnedHeroes(mockData.playerHeroes);
 
-        // Apply formation deployment data (set position/row for deployed heroes)
+        // ✅ STEP 2: Apply formation deployment data ONLY to deployed heroes
+        // This updates ONLY the heroes in playerFormation with position/row
         MockServerData.ApplyFormationData(playerTeam, mockData.playerFormation);
 
         // Load player stats
@@ -183,6 +185,7 @@ public class PlayerData : MonoBehaviour
 
         OnPlayerDataChanged?.Invoke();
     }
+
 
     /// <summary>
     /// Save player data to server (placeholder for now)
